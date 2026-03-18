@@ -1,0 +1,121 @@
+<div class="app-page">
+  <div class="page-card">
+    <header class="page-header">
+      <h1>Mis Mascotas</h1>
+      <p>Gestiona la información de tus mascotas y consulta datos rápidos.</p>
+    </header>
+
+    <div class="page-body">
+      <button class="btn btn-success mb-3" (click)="showCreateForm()">Crear Mascota</button>
+
+      <div *ngIf="showForm" class="card mb-4">
+        <div class="card-header">
+          <h5>{{ isEditing ? 'Editar Mascota' : 'Crear Nueva Mascota' }}</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="petForm" (ngSubmit)="savePet()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="name" formControlName="name" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="type" class="form-label">Tipo</label>
+                <input type="text" class="form-control" id="type" formControlName="type" required>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="age" class="form-label">Edad</label>
+                <input type="number" class="form-control" id="age" formControlName="age" required min="0">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="breed" class="form-label">Raza</label>
+                <input type="text" class="form-control" id="breed" formControlName="breed" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary me-2" [disabled]="!petForm.valid">Guardar</button>
+            <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancelar</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Edad</th>
+              <th>Raza</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let pet of pets">
+              <td>{{ pet.name }}</td>
+              <td>{{ pet.type }}</td>
+              <td>{{ pet.age }}</td>
+              <td>{{ pet.breed }}</td>
+              <td>
+                <button class="btn btn-info btn-sm me-2" (click)="openModal(pet)">Ver</button>
+                <button class="btn btn-warning btn-sm me-2" (click)="showEditForm(pet)">Editar</button>
+                <button class="btn btn-danger btn-sm" (click)="deletePet(pet.id)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para detalles de mascota -->
+<div class="modal fade" [ngClass]="{'show': modalVisible}" [style.display]="showModal ? 'block' : 'none'" *ngIf="showModal" tabindex="-1" role="dialog" aria-labelledby="petModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="petModalLabel">Detalles de {{ selectedPet?.name }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedPet">
+        <div class="row">
+          <div class="col-md-6">
+            <h6><strong>Nombre:</strong></h6>
+            <p>{{ selectedPet.name }}</p>
+          </div>
+          <div class="col-md-6">
+            <h6><strong>Tipo:</strong></h6>
+            <p>{{ selectedPet.type }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h6><strong>Edad:</strong></h6>
+            <p>{{ selectedPet.age }} años</p>
+          </div>
+          <div class="col-md-6">
+            <h6><strong>Raza:</strong></h6>
+            <p>{{ selectedPet.breed }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <h6><strong>ID de Mascota:</strong></h6>
+            <p>{{ selectedPet.id }}</p>
+          </div>
+          <div class="col-md-6">
+            <h6><strong>Dueño:</strong></h6>
+            <p>{{ userName }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del modal -->
+<div class="modal-backdrop fade show" *ngIf="showModal" (click)="closeModal()"></div>

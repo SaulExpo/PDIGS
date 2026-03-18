@@ -1,0 +1,37 @@
+/* Animación del modal */
+.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out;
+  transform: translate(0, -50px);
+}
+
+.modal.show .modal-dialog {
+  transform: translate(0, 0);
+}
+
+.modal-backdrop {
+  transition: opacity 0.3s ease-out;
+}
+
+/* Estilos adicionales para el modal */
+.modal-content {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border-radius: 15px 15px 0 0;
+  border-bottom: none;
+}
+
+.modal-body h6 {
+  color: #28a745;
+  margin-top: 15px;
+}
+
+.modal-body p {
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}

@@ -1,0 +1,68 @@
+.calendar-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f7fa, #e8f5e9);
+}
+
+.calendar-card {
+  width: 100%;
+  max-width: 1100px;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.calendar-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #2e7d32;
+}
+
+.calendar-header p {
+  margin: 0.25rem 0 1.5rem;
+  color: #4d4d4d;
+}
+
+.calendar-body {
+  max-height: calc(100vh - 240px);
+  overflow: auto;
+  padding-right: 0.5rem;
+}
+
+.calendar-body ::ng-deep .fc {
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fafafa;
+}
+
+.calendar-body ::ng-deep .fc-toolbar-title {
+  font-weight: 600;
+  color: #1b5e20;
+}
+
+.calendar-body ::ng-deep .fc-button {
+  border-radius: 999px;
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: #ffffff;
+}
+
+.calendar-body ::ng-deep .fc-button:hover {
+  background: #1b5e20;
+  border-color: #1b5e20;
+}
+
+.calendar-body ::ng-deep .fc-daygrid-event {
+  border-radius: 0.75rem;
+  padding: 0.35rem 0.4rem;
+  font-weight: 500;
+}
+
+.calendar-body ::ng-deep .fc-daygrid-event.fc-event-solid {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12);
+}
