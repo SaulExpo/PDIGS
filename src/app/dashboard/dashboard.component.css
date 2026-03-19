@@ -1,3 +1,13 @@
+.dashboard-sidebar {
+  width: 250px;
+  min-height: 100vh;
+}
+
+.sidebar-avatar {
+  width: 80px;
+  height: 80px;
+}
+
 .nav-link.active {
   background-color: #495057;
   border-radius: 5px;
@@ -6,4 +16,20 @@
 .nav-link:hover {
   background-color: #495057;
   border-radius: 5px;
+}
+
+.language-selector .form-label {
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.08em;
+}
+
+.language-selector .form-select {
+  background-color: #212529;
+  border-color: #495057;
+  color: #fff;
+}
+
+.language-selector .form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }

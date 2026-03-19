@@ -3,6 +3,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { addDoc, collection, deleteDoc, doc, Firestore, onSnapshot, query, updateDoc, where } from '@angular/fire/firestore';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe } from '../i18n/translate.pipe';
+import { TranslationService } from '../i18n/translation.service';
 
 interface Pet {
   id: string;
@@ -16,7 +18,7 @@ interface Pet {
 @Component({
   selector: 'app-pets',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './pets.component.html',
   styleUrl: './pets.component.css'
 })
@@ -28,7 +30,7 @@ export class PetsComponent implements OnInit {
   showModal = false;
   modalVisible = false;
   selectedPet: Pet | null = null;
-  userName: string = '';
+  userName = '';
 
   petForm = new FormGroup({
     name: new FormControl('', Validators.required),
@@ -39,11 +41,12 @@ export class PetsComponent implements OnInit {
 
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private translation = inject(TranslationService);
 
   ngOnInit() {
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
-        this.userName = user.displayName || 'Usuario';
+        this.userName = user.displayName || this.translation.translate('sidebar.defaultUser');
         this.loadPets(user.uid);
       }
     });
@@ -98,7 +101,7 @@ export class PetsComponent implements OnInit {
       const petData = {
         name: formValue.name!,
         type: formValue.type!,
-        age: parseInt(formValue.age!),
+        age: parseInt(formValue.age!, 10),
         breed: formValue.breed!,
         userId: this.auth.currentUser?.uid
       };

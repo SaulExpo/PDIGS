@@ -3,6 +3,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { addDoc, collection, deleteDoc, doc, Firestore, onSnapshot, query, updateDoc, where } from '@angular/fire/firestore';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe } from '../i18n/translate.pipe';
+import { TranslationService } from '../i18n/translation.service';
 
 interface Pet {
   id: string;
@@ -16,7 +18,7 @@ interface Pet {
 interface DiaryEntry {
   id: string;
   petId: string;
-  date: string; // YYYY-MM-DD
+  date: string;
   title: string;
   description: string;
   userId: string;
@@ -25,7 +27,7 @@ interface DiaryEntry {
 @Component({
   selector: 'app-diary',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './diary.component.html',
   styleUrl: './diary.component.css'
 })
@@ -48,6 +50,7 @@ export class DiaryComponent implements OnInit {
 
   private firestore = inject(Firestore);
   private auth = inject(Auth);
+  private translation = inject(TranslationService);
 
   ngOnInit() {
     onAuthStateChanged(this.auth, (user) => {
@@ -164,6 +167,7 @@ export class DiaryComponent implements OnInit {
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const locale = this.translation.getLanguage() === 'en' ? 'en-US' : 'es-ES';
+    return date.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
 }

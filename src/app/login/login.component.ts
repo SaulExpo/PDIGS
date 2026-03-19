@@ -4,11 +4,12 @@ import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updat
 import { Firestore, addDoc, collection } from '@angular/fire/firestore';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '../i18n/translate.pipe';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })

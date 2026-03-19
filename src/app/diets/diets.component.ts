@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { addDoc, collection, deleteDoc, doc, Firestore, onSnapshot, query, updateDoc, where } from '@angular/fire/firestore';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe } from '../i18n/translate.pipe';
 
 interface Pet {
   id: string;
@@ -24,7 +25,7 @@ interface Diet {
 @Component({
   selector: 'app-diets',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './diets.component.html',
   styleUrl: './diets.component.css'
 })

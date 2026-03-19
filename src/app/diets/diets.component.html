@@ -1,14 +1,14 @@
 <div class="app-page">
   <div class="page-card">
     <header class="page-header">
-      <h1>Dietas de Mascotas</h1>
-      <p>Gestiona planes de alimentación por mascota.</p>
+      <h1>{{ 'diets.title' | translate }}</h1>
+      <p>{{ 'diets.subtitle' | translate }}</p>
     </header>
 
     <div class="page-body">
       <div class="row">
         <div class="col-md-4">
-          <h3>Seleccionar Mascota</h3>
+          <h3>{{ 'diets.selectPet' | translate }}</h3>
           <div class="list-group">
             <button
               *ngFor="let pet of pets"
@@ -22,25 +22,25 @@
         </div>
 
         <div class="col-md-8" *ngIf="selectedPetId">
-          <h3>Dietas para {{ getSelectedPetName() }}</h3>
-          <button class="btn btn-success mb-3" (click)="showCreateForm()">Crear Dieta</button>
+          <h3>{{ 'diets.forPet' | translate }} {{ getSelectedPetName() }}</h3>
+          <button class="btn btn-success mb-3" (click)="showCreateForm()">{{ 'diets.create' | translate }}</button>
 
           <div *ngIf="showForm" class="card mb-4">
             <div class="card-header">
-              <h5>{{ isEditing ? 'Editar Dieta' : 'Crear Nueva Dieta' }}</h5>
+              <h5>{{ isEditing ? ('diets.editTitle' | translate) : ('diets.createTitle' | translate) }}</h5>
             </div>
             <div class="card-body">
               <form [formGroup]="dietForm" (ngSubmit)="saveDiet()">
                 <div class="mb-3">
-                  <label for="name" class="form-label">Nombre de la Dieta</label>
+                  <label for="name" class="form-label">{{ 'diets.nameLabel' | translate }}</label>
                   <input type="text" class="form-control" id="name" formControlName="name" required>
                 </div>
                 <div class="mb-3">
-                  <label for="description" class="form-label">Descripción</label>
+                  <label for="description" class="form-label">{{ 'diets.descriptionLabel' | translate }}</label>
                   <textarea class="form-control" id="description" formControlName="description" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary me-2" [disabled]="!dietForm.valid">Guardar</button>
-                <button type="button" class="btn btn-secondary" (click)="cancelForm()">Cancelar</button>
+                <button type="submit" class="btn btn-primary me-2" [disabled]="!dietForm.valid">{{ 'diets.save' | translate }}</button>
+                <button type="button" class="btn btn-secondary" (click)="cancelForm()">{{ 'diets.cancel' | translate }}</button>
               </form>
             </div>
           </div>
@@ -49,9 +49,9 @@
             <table class="table table-striped table-hover">
               <thead class="table-dark">
                 <tr>
-                  <th>Nombre</th>
-                  <th>Descripción</th>
-                  <th>Acciones</th>
+                  <th>{{ 'form.name' | translate }}</th>
+                  <th>{{ 'form.description' | translate }}</th>
+                  <th>{{ 'diets.actions' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -59,8 +59,8 @@
                   <td>{{ diet.name }}</td>
                   <td>{{ diet.description }}</td>
                   <td>
-                    <button class="btn btn-warning btn-sm me-2" (click)="showEditForm(diet)">Editar</button>
-                    <button class="btn btn-danger btn-sm" (click)="deleteDiet(diet.id)">Eliminar</button>
+                    <button class="btn btn-warning btn-sm me-2" (click)="showEditForm(diet)">{{ 'diary.edit' | translate }}</button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteDiet(diet.id)">{{ 'diary.delete' | translate }}</button>
                   </td>
                 </tr>
               </tbody>

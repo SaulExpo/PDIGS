@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { TranslatePipe } from '../i18n/translate.pipe';
 
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [GoogleMapsModule],
+  imports: [GoogleMapsModule, TranslatePipe],
   templateUrl: './map.component.html',
   styleUrl: './map.component.css'
 })
