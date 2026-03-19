@@ -8,9 +8,14 @@
 
 # IDEs
 .vscode
+.idea
 
 # Environment variables
 .env
+
+# Nix & direnv config
+.envrc
+shell.nix
 
 # Local env loader
 /src/assets/env.js
