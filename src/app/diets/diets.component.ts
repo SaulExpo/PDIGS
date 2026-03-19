@@ -23,11 +23,10 @@ interface Diet {
 }
 
 @Component({
-  selector: 'app-diets',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
-  templateUrl: './diets.component.html',
-  styleUrl: './diets.component.css'
+    selector: 'app-diets',
+    imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+    templateUrl: './diets.component.html',
+    styleUrl: './diets.component.css'
 })
 export class DietsComponent implements OnInit {
   pets: Pet[] = [];

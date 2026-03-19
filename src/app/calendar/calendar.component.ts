@@ -24,11 +24,10 @@ interface Pet {
 }
 
 @Component({
-  selector: 'app-calendar',
-  standalone: true,
-  imports: [FullCalendarModule, TranslatePipe],
-  templateUrl: './calendar.component.html',
-  styleUrl: './calendar.component.css'
+    selector: 'app-calendar',
+    imports: [FullCalendarModule, TranslatePipe],
+    templateUrl: './calendar.component.html',
+    styleUrl: './calendar.component.css'
 })
 export class CalendarComponent implements OnInit {
   calendarOptions: CalendarOptions = {

@@ -25,11 +25,10 @@ interface DiaryEntry {
 }
 
 @Component({
-  selector: 'app-diary',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
-  templateUrl: './diary.component.html',
-  styleUrl: './diary.component.css'
+    selector: 'app-diary',
+    imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+    templateUrl: './diary.component.html',
+    styleUrl: './diary.component.css'
 })
 export class DiaryComponent implements OnInit {
   pets: Pet[] = [];

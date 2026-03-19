@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged, signOut } from '@angular/fire/auth';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -6,11 +6,10 @@ import { TranslatePipe } from '../i18n/translate.pipe';
 import { SupportedLang, TranslationService } from '../i18n/translation.service';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, TranslatePipe],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+    selector: 'app-dashboard',
+    imports: [RouterOutlet, RouterLink, TranslatePipe],
+    templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent implements OnInit {
   userName = '';

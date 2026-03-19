@@ -1,3 +1,4 @@
+import { provideZoneChangeDetection } from "@angular/core";
 import { bootstrapApplication } from '@angular/platform-browser';
 
 import { AppComponent } from './app/app.component';
@@ -27,5 +28,5 @@ function loadGoogleMapsApi(): Promise<void> {
 }
 
 loadGoogleMapsApi()
-  .then(() => bootstrapApplication(AppComponent, appConfig))
+  .then(() => bootstrapApplication(AppComponent, {...appConfig, providers: [provideZoneChangeDetection(), ...appConfig.providers]}))
   .catch((err) => console.error(err));

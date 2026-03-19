@@ -3,11 +3,10 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { TranslatePipe } from '../i18n/translate.pipe';
 
 @Component({
-  selector: 'app-map',
-  standalone: true,
-  imports: [GoogleMapsModule, TranslatePipe],
-  templateUrl: './map.component.html',
-  styleUrl: './map.component.css'
+    selector: 'app-map',
+    imports: [GoogleMapsModule, TranslatePipe],
+    templateUrl: './map.component.html',
+    styleUrl: './map.component.css'
 })
 export class MapComponent implements OnInit {
   center: google.maps.LatLngLiteral = { lat: 40.4168, lng: -3.7038 }; // Madrid por defecto

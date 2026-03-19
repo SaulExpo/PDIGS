@@ -16,11 +16,10 @@ interface Pet {
 }
 
 @Component({
-  selector: 'app-pets',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
-  templateUrl: './pets.component.html',
-  styleUrl: './pets.component.css'
+    selector: 'app-pets',
+    imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+    templateUrl: './pets.component.html',
+    styleUrl: './pets.component.css'
 })
 export class PetsComponent implements OnInit {
   pets: Pet[] = [];
