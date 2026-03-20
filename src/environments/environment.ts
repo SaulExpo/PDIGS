@@ -13,5 +13,5 @@ const defaultEnvironment = {
 };
 
 export const environment = (window as any).__env
-  ? { ...defaultEnvironment, ...(window as any).__env }
+  ? {...defaultEnvironment, ...(window as any).__env}
   : defaultEnvironment;

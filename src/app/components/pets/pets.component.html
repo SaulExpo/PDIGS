@@ -1,0 +1,137 @@
+<div class="app-page">
+  <div class="page-card">
+    <header class="page-header">
+      <h1>{{ 'pets.title' | translate }}</h1>
+      <p>{{ 'pets.subtitle' | translate }}</p>
+    </header>
+
+    <div class="page-body">
+      <button class="btn btn-success mb-3" (click)="showCreateForm()">{{ 'pets.create' | translate }}</button>
+
+      @if (showForm) {
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{{ isEditing ? ('pets.editTitle' | translate) : ('pets.createTitle' | translate) }}</h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="petForm" (ngSubmit)="savePet()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="name" class="form-label">{{ 'form.name' | translate }}</label>
+                  <input type="text" class="form-control" id="name" formControlName="name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="type" class="form-label">{{ 'form.type' | translate }}</label>
+                  <input type="text" class="form-control" id="type" formControlName="type" required>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="age" class="form-label">{{ 'form.age' | translate }}</label>
+                  <input type="number" class="form-control" id="age" formControlName="age" required min="0">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="breed" class="form-label">{{ 'form.breed' | translate }}</label>
+                  <input type="text" class="form-control" id="breed" formControlName="breed" required>
+                </div>
+              </div>
+              <button [disabled]="!petForm.valid" class="btn btn-primary me-2"
+                      type="submit">{{ 'pets.save' | translate }}
+              </button>
+              <button (click)="cancelForm()" class="btn btn-secondary" type="button">{{ 'pets.cancel' | translate }}
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+          <tr>
+            <th>{{ 'form.name' | translate }}</th>
+            <th>{{ 'form.type' | translate }}</th>
+            <th>{{ 'form.age' | translate }}</th>
+            <th>{{ 'form.breed' | translate }}</th>
+            <th>{{ 'pets.actions' | translate }}</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (pet of pets; track pet) {
+              <tr>
+                <td>{{ pet.name }}</td>
+                <td>{{ pet.type }}</td>
+                <td>{{ pet.age }}</td>
+                <td>{{ pet.breed }}</td>
+                <td>
+                  <button (click)="openModal(pet)" class="btn btn-info btn-sm me-2">{{ 'pets.view' | translate }}
+                  </button>
+                  <button (click)="showEditForm(pet)"
+                          class="btn btn-warning btn-sm me-2">{{ 'pets.edit' | translate }}
+                  </button>
+                  <button (click)="deletePet(pet.id)" class="btn btn-danger btn-sm">{{ 'pets.delete' | translate }}
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (showModal) {
+  <div [ngClass]="{'show': modalVisible}" [style.display]="showModal ? 'block' : 'none'" aria-hidden="true"
+       aria-labelledby="petModalLabel" class="modal fade" role="dialog" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="petModalLabel">{{ 'pets.detailsTitle' | translate }} {{ selectedPet?.name }}</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+        @if (selectedPet) {
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6><strong>{{ 'form.name' | translate }}:</strong></h6>
+                <p>{{ selectedPet.name }}</p>
+              </div>
+              <div class="col-md-6">
+                <h6><strong>{{ 'form.type' | translate }}:</strong></h6>
+                <p>{{ selectedPet.type }}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <h6><strong>{{ 'form.age' | translate }}:</strong></h6>
+                <p>{{ selectedPet.age }} {{ 'pets.ageYears' | translate }}</p>
+              </div>
+              <div class="col-md-6">
+                <h6><strong>{{ 'form.breed' | translate }}:</strong></h6>
+                <p>{{ selectedPet.breed }}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <h6><strong>{{ 'pets.petId' | translate }}:</strong></h6>
+                <p>{{ selectedPet.id }}</p>
+              </div>
+              <div class="col-md-6">
+                <h6><strong>{{ 'pets.owner' | translate }}:</strong></h6>
+                <p>{{ userName }}</p>
+              </div>
+            </div>
+          </div>
+        }
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'pets.close' | translate }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showModal) {
+  <div class="modal-backdrop fade show" (click)="closeModal()"></div>
+}

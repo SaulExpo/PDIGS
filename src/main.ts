@@ -28,5 +28,8 @@ function loadGoogleMapsApi(): Promise<void> {
 }
 
 loadGoogleMapsApi()
-  .then(() => bootstrapApplication(AppComponent, {...appConfig, providers: [provideZoneChangeDetection(), ...appConfig.providers]}))
+  .then(() => bootstrapApplication(AppComponent, {
+    ...appConfig,
+    providers: [provideZoneChangeDetection(), ...appConfig.providers]
+  }))
   .catch((err) => console.error(err));
