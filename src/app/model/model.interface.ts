@@ -23,3 +23,12 @@ export interface Diet {
   description: string;
   userId: string;
 }
+
+export interface MedicalEntry {
+  id: string;
+  petId: string;
+  userId: string;
+  date: string;
+  type: 'vaccine' | 'test' | 'other';
+  description: string;
+}
