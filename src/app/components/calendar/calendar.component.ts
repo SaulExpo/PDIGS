@@ -1,19 +1,22 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions } from '@fullcalendar/core';
+import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { TranslationService } from '../../i18n/translation.service';
-import { DiaryEntry, Pet } from "../../model/model.interface";
-import { Subscription } from "rxjs";
-import { PetsService } from "../../services/pets/pets.service";
-import { DiaryService } from "../../services/diary/diary.service";
+import { CalendarEventEntry, DiaryEntry, Pet } from '../../model/model.interface';
+import { Subscription } from 'rxjs';
+import { PetsService } from '../../services/pets/pets.service';
+import { DiaryService } from '../../services/diary/diary.service';
+import { CalendarEventsService } from '../../services/calendar-events/calendar-events.service';
 
 @Component({
   selector: 'app-calendar',
-  imports: [FullCalendarModule, TranslatePipe],
+  imports: [CommonModule, FullCalendarModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
@@ -22,6 +25,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private translation = inject(TranslationService);
   private petsService = inject(PetsService);
   private diaryService = inject(DiaryService);
+  private calendarEventsService = inject(CalendarEventsService);
+
+  currentUserId = '';
 
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, interactionPlugin],
@@ -32,15 +38,45 @@ export class CalendarComponent implements OnInit, OnDestroy {
   };
 
   diaryEntries: DiaryEntry[] = [];
+  customEvents: CalendarEventEntry[] = [];
   pets: Pet[] = [];
+
+  showEventForm = false;
+  isSavingEvent = false;
+  showModal = false;
+  modalVisible = false;
+  selectedEventDetails: {
+    id: string;
+    source: 'diary' | 'custom';
+    title: string;
+    description: string;
+    petName: string;
+    date: string;
+    time: string;
+  } | null = null;
+
+  successMessage = '';
+  errorMessage = '';
+
+  eventForm = new FormGroup({
+    title: new FormControl('', Validators.required),
+    description: new FormControl('', Validators.required),
+    date: new FormControl('', Validators.required),
+    time: new FormControl('', Validators.required),
+    petId: new FormControl('', Validators.required)
+  });
+
   private petsSubscription: Subscription | null = null;
   private diarySubscription: Subscription | null = null;
+  private customEventsSubscription: Subscription | null = null;
 
   ngOnInit() {
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
+        this.currentUserId = user.uid;
         this.loadPets(user.uid);
         this.loadDiaryEntries(user.uid);
+        this.loadCustomEvents(user.uid);
       }
     });
   }
@@ -69,35 +105,206 @@ export class CalendarComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadCustomEvents(userId: string) {
+    if (this.customEventsSubscription) this.customEventsSubscription.unsubscribe();
+
+    this.customEventsSubscription = this.calendarEventsService.getCalendarEventsByUser(userId).subscribe({
+      next: (events) => {
+        this.customEvents = events;
+        this.updateCalendarEvents();
+      },
+      error: (err) => console.error('Error loading custom calendar events:', err)
+    });
+  }
+
   updateCalendarEvents() {
     const petFallback = this.translation.translate('calendar.petFallback');
-    const events = this.diaryEntries.map(entry => {
+
+    const diaryEvents = this.diaryEntries.map(entry => {
       const pet = this.pets.find(p => p.id === entry.petId);
+
       return {
-        id: entry.id,
+        id: `diary-${entry.id}`,
         title: `${pet?.name || petFallback}: ${entry.title}`,
         date: entry.date,
+        allDay: true,
         extendedProps: {
           description: entry.description,
-          petName: pet?.name || petFallback
+          petName: pet?.name || petFallback,
+          time: '',
+          source: 'diary'
         }
       };
     });
 
-    this.calendarOptions = {...this.calendarOptions, events};
+    const customEvents = this.customEvents.map(event => {
+      const pet = this.pets.find(p => p.id === event.petId);
+
+      return {
+        id: `custom-${event.id}`,
+        start: `${event.date}T${event.time}`,
+        title: event.title,
+        allDay: false,
+        extendedProps: {
+          description: event.description,
+          petName: pet?.name || petFallback,
+          time: event.time,
+          source: 'custom'
+        }
+      };
+    });
+
+    this.calendarOptions = {
+      ...this.calendarOptions,
+      events: [...diaryEvents, ...customEvents]
+    };
   }
 
-  handleDateClick(arg: any) {
-    alert(`${this.translation.translate('calendar.selectedDate')}: ${arg.dateStr}`);
+  clearMessages() {
+    this.successMessage = '';
+    this.errorMessage = '';
   }
 
-  handleEventClick(arg: any) {
+  openCreateEventForm(selectedDate?: string) {
+    this.clearMessages();
+    this.eventForm.reset();
+    this.eventForm.patchValue({
+      date: selectedDate || new Date().toISOString().split('T')[0],
+      time: '09:00',
+      petId: this.pets.length ? this.pets[0].id : ''
+    });
+    this.showEventForm = true;
+  }
+
+  cancelEventForm() {
+    this.showEventForm = false;
+    this.eventForm.reset();
+  }
+
+  handleDateClick(arg: DateClickArg) {
+    this.openCreateEventForm(arg.dateStr);
+  }
+
+  async saveCustomEvent() {
+    this.clearMessages();
+
+    if (this.eventForm.invalid) {
+      this.errorMessage = 'Please fill in all event fields correctly.';
+      this.eventForm.markAllAsTouched();
+      return;
+    }
+
+    if (!this.currentUserId) {
+      this.errorMessage = 'User session not found.';
+      return;
+    }
+
+    const formValue = this.eventForm.value;
+
+    const eventData = {
+      title: formValue.title!,
+      description: formValue.description!,
+      date: formValue.date!,
+      time: formValue.time!,
+      petId: formValue.petId!,
+      userId: this.currentUserId
+    };
+
+    try {
+      this.isSavingEvent = true;
+      const newId = await this.calendarEventsService.addCalendarEvent(eventData);
+
+      this.customEvents = [
+        ...this.customEvents,
+        {
+          id: newId,
+          ...eventData
+        }
+      ];
+      this.updateCalendarEvents();
+
+      this.successMessage = 'Event created successfully.';
+      this.cancelEventForm();
+
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving calendar event:', error);
+      this.errorMessage = 'An error occurred while saving the event.';
+    } finally {
+      this.isSavingEvent = false;
+    }
+  }
+
+  handleEventClick(arg: EventClickArg) {
     const event = arg.event;
-    alert(`${this.translation.translate('calendar.event')}: ${event.title}\n${this.translation.translate('calendar.description')}: ${event.extendedProps.description}`);
+    const rawId = event.id.startsWith('custom-')
+      ? event.id.replace('custom-', '')
+      : event.id.replace('diary-', '');
+
+    this.selectedEventDetails = {
+      id: rawId,
+      source: event.extendedProps['source'] || 'diary',
+      title: event.title,
+      description: event.extendedProps['description'] || '',
+      petName: event.extendedProps['petName'] || this.translation.translate('calendar.petFallback'),
+      date: event.start
+        ? event.start.toISOString().split('T')[0]
+        : '',
+      time: event.extendedProps['time'] || ''
+    };
+
+    this.showModal = true;
+    setTimeout(() => {
+      this.modalVisible = true;
+    }, 10);
+  }
+
+  async deleteSelectedEvent() {
+    if (!this.selectedEventDetails) return;
+
+    if (this.selectedEventDetails.source !== 'custom') {
+      this.errorMessage = 'Only custom events can be deleted.';
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to delete this event?');
+    if (!confirmed) return;
+
+    try {
+      const eventId = this.selectedEventDetails.id;
+
+      await this.calendarEventsService.deleteCalendarEvent(eventId);
+
+      this.customEvents = this.customEvents.filter(event => event.id !== eventId);
+      this.updateCalendarEvents();
+
+      this.closeModal();
+      this.clearMessages();
+      this.successMessage = 'Event deleted successfully.';
+
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
+    } catch (error) {
+      console.error('Error deleting calendar event:', error);
+      this.clearMessages();
+      this.errorMessage = 'An error occurred while deleting the event.';
+    }
+  }
+
+  closeModal() {
+    this.modalVisible = false;
+    setTimeout(() => {
+      this.showModal = false;
+      this.selectedEventDetails = null;
+    }, 300);
   }
 
   ngOnDestroy() {
     if (this.petsSubscription) this.petsSubscription.unsubscribe();
     if (this.diarySubscription) this.diarySubscription.unsubscribe();
+    if (this.customEventsSubscription) this.customEventsSubscription.unsubscribe();
   }
 }

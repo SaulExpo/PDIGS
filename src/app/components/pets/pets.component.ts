@@ -32,12 +32,16 @@ export class PetsComponent implements OnInit, OnDestroy {
   userName = '';
   isExporting = false;
 
+  successMessage = '';
+  errorMessage = '';
+
   petForm = new FormGroup({
     name: new FormControl('', Validators.required),
     type: new FormControl('', Validators.required),
     age: new FormControl('', [Validators.required, Validators.min(0)]),
     breed: new FormControl('', Validators.required)
   });
+
   private translation = inject(TranslationService);
   private petsSubscription: Subscription | null = null;
 
@@ -59,11 +63,23 @@ export class PetsComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearMessages() {
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
   async deletePet(petId: string) {
     try {
       await this.petsService.deletePet(petId);
+      this.clearMessages();
+      this.successMessage = 'Pet deleted successfully.';
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
     } catch (error) {
       console.error('Error deleting pet:', error);
+      this.clearMessages();
+      this.errorMessage = 'An error occurred while deleting the pet.';
     }
   }
 
@@ -79,13 +95,14 @@ export class PetsComponent implements OnInit, OnDestroy {
       this.pdfExportService.exportPetData(exportData);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert('There was an error generating the PDF.');
+      this.errorMessage = 'There was an error generating the PDF.';
     } finally {
       this.isExporting = false;
     }
   }
 
   showCreateForm() {
+    this.clearMessages();
     this.isEditing = false;
     this.editingPetId = null;
     this.petForm.reset();
@@ -93,6 +110,7 @@ export class PetsComponent implements OnInit, OnDestroy {
   }
 
   showEditForm(pet: Pet) {
+    this.clearMessages();
     this.isEditing = true;
     this.editingPetId = pet.id;
     this.petForm.setValue({
@@ -105,31 +123,51 @@ export class PetsComponent implements OnInit, OnDestroy {
   }
 
   cancelForm() {
+    this.clearMessages();
     this.showForm = false;
     this.petForm.reset();
+    this.isEditing = false;
+    this.editingPetId = null;
   }
 
   async savePet() {
-    if (this.petForm.valid) {
-      const formValue = this.petForm.value;
-      const petData = {
-        name: formValue.name!,
-        type: formValue.type!,
-        age: parseInt(formValue.age!, 10),
-        breed: formValue.breed!,
-        userId: this.auth.currentUser?.uid!
-      };
+    this.clearMessages();
 
-      try {
-        if (this.isEditing && this.editingPetId) {
-          await this.petsService.updatePet(this.editingPetId, petData);
-        } else {
-          await this.petsService.addPet(petData);
-        }
-        this.cancelForm();
-      } catch (error) {
-        console.error('Error saving pet:', error);
+    if (this.petForm.invalid) {
+      this.errorMessage = 'Please fill in all fields correctly.';
+      this.petForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.petForm.value;
+    const petData = {
+      name: formValue.name!,
+      type: formValue.type!,
+      age: parseInt(formValue.age!, 10),
+      breed: formValue.breed!,
+      userId: this.auth.currentUser?.uid!
+    };
+
+    try {
+      if (this.isEditing && this.editingPetId) {
+        await this.petsService.updatePet(this.editingPetId, petData);
+        this.successMessage = 'Pet updated successfully.';
+      } else {
+        await this.petsService.addPet(petData);
+        this.successMessage = 'Pet created successfully.';
       }
+
+      this.showForm = false;
+      this.petForm.reset();
+      this.isEditing = false;
+      this.editingPetId = null;
+
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 3000);
+    } catch (error) {
+      console.error('Error saving pet:', error);
+      this.errorMessage = 'An error occurred while saving the pet.';
     }
   }
 

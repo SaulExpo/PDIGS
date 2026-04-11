@@ -41,3 +41,13 @@ export interface PetExportData {
   expenses: string[];
   ownerName: string;
 }
+
+export interface CalendarEventEntry {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  petId: string;
+  userId: string;
+}
