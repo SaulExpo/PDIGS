@@ -6,15 +6,9 @@ import { TranslatePipe } from '../../i18n/translate.pipe';
 import { TranslationService } from '../../i18n/translation.service';
 import { Subscription } from "rxjs";
 import { PetsService } from "../../services/pets/pets.service";
-
-interface Pet {
-  id: string;
-  name: string;
-  type: string;
-  age: number;
-  breed: string;
-  userId: string;
-}
+import { Pet } from '../../model/model.interface';
+import { PetExportService } from '../../services/pet-export/pet-export.service';
+import { PdfExportService } from '../../services/pdf-export/pdf-export.service';
 
 @Component({
   selector: 'app-pets',
@@ -26,6 +20,8 @@ export class PetsComponent implements OnInit, OnDestroy {
   pets: Pet[] = [];
   private petsService = inject(PetsService);
   private auth = inject(Auth);
+  private petExportService = inject(PetExportService);
+  private pdfExportService = inject(PdfExportService);
 
   showForm = false;
   isEditing = false;
@@ -34,6 +30,7 @@ export class PetsComponent implements OnInit, OnDestroy {
   modalVisible = false;
   selectedPet: Pet | null = null;
   userName = '';
+  isExporting = false;
 
   petForm = new FormGroup({
     name: new FormControl('', Validators.required),
@@ -67,6 +64,24 @@ export class PetsComponent implements OnInit, OnDestroy {
       await this.petsService.deletePet(petId);
     } catch (error) {
       console.error('Error deleting pet:', error);
+    }
+  }
+
+  async exportPetToPdf(pet: Pet) {
+    try {
+      this.isExporting = true;
+
+      const exportData = await this.petExportService.getPetExportData(
+        pet,
+        this.userName || 'Unknown owner'
+      );
+
+      this.pdfExportService.exportPetData(exportData);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('There was an error generating the PDF.');
+    } finally {
+      this.isExporting = false;
     }
   }
 

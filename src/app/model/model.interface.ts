@@ -32,3 +32,12 @@ export interface MedicalEntry {
   type: 'vaccine' | 'test' | 'other';
   description: string;
 }
+
+export interface PetExportData {
+  pet: Pet;
+  diets: Diet[];
+  diaryEntries: DiaryEntry[];
+  medicalRecords: string[];
+  expenses: string[];
+  ownerName: string;
+}

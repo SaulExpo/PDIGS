@@ -69,6 +69,13 @@
                   <button (click)="showEditForm(pet)"
                           class="btn btn-warning btn-sm me-2">{{ 'pets.edit' | translate }}
                   </button>
+                  <button
+                    (click)="exportPetToPdf(pet)"
+                    class="btn btn-secondary btn-sm me-2"
+                    [disabled]="isExporting"
+                  >
+                    {{ isExporting ? 'Exporting...' : 'Export PDF' }}
+                  </button>
                   <button (click)="deletePet(pet.id)" class="btn btn-danger btn-sm">{{ 'pets.delete' | translate }}
                   </button>
                 </td>
@@ -125,6 +132,16 @@
           </div>
         }
         <div class="modal-footer">
+          @if (selectedPet) {
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="exportPetToPdf(selectedPet)"
+              [disabled]="isExporting"
+            >
+              {{ isExporting ? 'Exporting...' : 'Export PDF' }}
+            </button>
+          }
           <button type="button" class="btn btn-secondary" (click)="closeModal()">{{ 'pets.close' | translate }}</button>
         </div>
       </div>
