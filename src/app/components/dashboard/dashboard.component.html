@@ -1,38 +1,66 @@
-<div class="d-flex vh-100 w-100">
-  <div class="dashboard-sidebar bg-dark text-white p-3">
-    <div class="text-center mb-4">
-      <img [src]="userPhotoURL" [alt]="'sidebar.userPhotoAlt' | translate" class="rounded-circle mb-2 sidebar-avatar">
-      <h5>{{ userName }}</h5>
+<div class="dashboard-shell" [class.sidebar-collapsed]="isSidebarCollapsed && !isMobile">
+  <aside
+    class="dashboard-sidebar"
+    [class.dashboard-sidebar--open]="isSidebarOpen"
+    [class.dashboard-sidebar--collapsed]="isSidebarCollapsed && !isMobile"
+  >
+    <div class="sidebar-header">
+      <button
+        type="button"
+        class="sidebar-icon-btn d-lg-none"
+        (click)="closeSidebar()"
+        [attr.aria-label]="'sidebar.closeMenu' | translate"
+      >
+        X
+      </button>
+
+      <button
+        type="button"
+        class="sidebar-icon-btn d-none d-lg-inline-flex"
+        (click)="toggleSidebarCollapsed()"
+        [attr.aria-label]="(isSidebarCollapsed ? 'sidebar.expand' : 'sidebar.collapse') | translate"
+      >
+        {{ isSidebarCollapsed ? '>' : '<' }}
+      </button>
     </div>
 
-    <nav class="nav flex-column">
-      <a class="nav-link text-white" routerLink="pets" routerLinkActive="active">
-        <i class="fas fa-paw me-2"></i>{{ 'sidebar.pets' | translate }}
+    <div class="sidebar-profile text-center mb-4">
+      <img [src]="userPhotoURL" [alt]="'sidebar.userPhotoAlt' | translate" class="rounded-circle mb-2 sidebar-avatar">
+      @if (!isSidebarCollapsed || isMobile) {
+        <h5>{{ userName }}</h5>
+      }
+    </div>
+
+    <nav class="nav flex-column sidebar-nav">
+      <a class="nav-link text-white" routerLink="pets" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-paw me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.pets' | translate }}</span>
       </a>
-      <a class="nav-link text-white" routerLink="diets" routerLinkActive="active">
-        <i class="fas fa-utensils me-2"></i>{{ 'sidebar.diets' | translate }}
+      <a class="nav-link text-white" routerLink="diets" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-utensils me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.diets' | translate }}</span>
       </a>
-      <a class="nav-link text-white" routerLink="diary" routerLinkActive="active">
-        <i class="fas fa-book me-2"></i>{{ 'sidebar.diary' | translate }}
+      <a class="nav-link text-white" routerLink="diary" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-book me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.diary' | translate }}</span>
       </a>
-      <a class="nav-link text-white" routerLink="medical-records" routerLinkActive="active">
-        <i class="fas fa-stethoscope me-2"></i>{{ 'sidebar.medicalRecords' | translate }}
+      <a class="nav-link text-white" routerLink="medical-records" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-stethoscope me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.medicalRecords' | translate }}</span>
       </a>
-      <a class="nav-link text-white" routerLink="calendar" routerLinkActive="active">
-        <i class="fas fa-calendar me-2"></i>{{ 'sidebar.calendar' | translate }}
+      <a class="nav-link text-white" routerLink="calendar" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-calendar me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.calendar' | translate }}</span>
       </a>
-      <a class="nav-link text-white" routerLink="map" routerLinkActive="active">
-        <i class="fas fa-map me-2"></i>{{ 'sidebar.map' | translate }}
+      <a class="nav-link text-white" routerLink="map" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-map me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.map' | translate }}</span>
       </a>
-      <a class="nav-link text-white" routerLink="finances" routerLinkActive="active">
-        <i class="fas fa-dollar-sign me-2"></i>{{ 'sidebar.finances' | translate }}
+      <a class="nav-link text-white" routerLink="finances" routerLinkActive="active" (click)="closeSidebar()">
+        <i class="fas fa-dollar-sign me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.finances' | translate }}</span>
       </a>
 
       <hr class="my-3">
 
-      <div class="language-selector mb-3">
+      <div class="language-selector mb-3" [class.language-selector--collapsed]="isSidebarCollapsed && !isMobile">
+        @if (!isSidebarCollapsed || isMobile) {
           <label class="form-label text-uppercase small"
                  for="sidebar-language">{{ 'sidebar.language' | translate }}</label>
+        }
         <select
           id="sidebar-language"
           class="form-select form-select-sm"
@@ -44,12 +72,29 @@
       </div>
 
       <a class="nav-link text-white" (click)="logout()" style="cursor: pointer;">
-        <i class="fas fa-sign-out-alt me-2"></i>{{ 'sidebar.logout' | translate }}
+        <i class="fas fa-sign-out-alt me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.logout' | translate }}</span>
       </a>
     </nav>
-  </div>
+  </aside>
 
-  <div class="flex-grow-1 bg-light">
-    <router-outlet></router-outlet>
-  </div>
+  @if (isMobile && isSidebarOpen) {
+    <button type="button" class="sidebar-overlay" (click)="closeSidebar()" aria-hidden="true"></button>
+  }
+
+  <main class="dashboard-main">
+    <header class="dashboard-topbar">
+      <button
+        type="button"
+        class="sidebar-icon-btn d-lg-none"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="'sidebar.openMenu' | translate"
+      >
+        |||
+      </button>
+    </header>
+
+    <div class="dashboard-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
 </div>

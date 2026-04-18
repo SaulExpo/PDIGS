@@ -8,6 +8,7 @@ import { PetsService } from "../../services/pets/pets.service";
 import { MedicalService } from "../../services/medical/medical.service";
 import { Subscription } from "rxjs";
 import { MedicalEntry, Pet } from "../../model/model.interface";
+import { AlertService } from '../../services/alert/alert.service';
 
 @Component({
   selector: 'app-medical-records',
@@ -45,6 +46,7 @@ export class MedicalRecordsComponent implements OnInit, OnDestroy {
   private petsService = inject(PetsService);
   private medicalService = inject(MedicalService);
   private translation = inject(TranslationService);
+  private alertService = inject(AlertService);
 
   private petsSub?: Subscription;
   private medicalSub?: Subscription;
@@ -118,28 +120,50 @@ export class MedicalRecordsComponent implements OnInit, OnDestroy {
   }
 
   async saveEntry() {
-    if (this.medicalForm.valid && this.selectedPetId) {
+    if (!this.medicalForm.valid || !this.selectedPetId) {
+      this.medicalForm.markAllAsTouched();
+      await this.alertService.validation(
+        'Completa correctamente todos los campos del registro medico.',
+        'Please fill in all medical record fields correctly.'
+      );
+      return;
+    }
 
-      const data = {
-        petId: this.selectedPetId,
-        userId: this.auth.currentUser?.uid!,
-        date: this.medicalForm.value.date!,
-          type: this.medicalForm.value.type as 'vaccine' | 'test' | 'other',
-        description: this.medicalForm.value.description || ''
-      };
+    const data = {
+      petId: this.selectedPetId,
+      userId: this.auth.currentUser?.uid!,
+      date: this.medicalForm.value.date!,
+      type: this.medicalForm.value.type as 'vaccine' | 'test' | 'other',
+      description: this.medicalForm.value.description || ''
+    };
 
+    try {
       if (this.isEditing && this.editingEntryId) {
         await this.medicalService.updateEntry(this.editingEntryId, data);
+        await this.alertService.success('update', this.getEntityLabel());
       } else {
         await this.medicalService.addEntry(data);
+        await this.alertService.success('create', this.getEntityLabel());
       }
 
       this.cancelForm();
+    } catch (error) {
+      console.error('Error saving medical entry:', error);
+      await this.alertService.error('save', this.getEntityLabel());
     }
   }
 
   async deleteEntry(id: string) {
-    await this.medicalService.deleteEntry(id);
+    const confirmed = await this.alertService.confirmDelete(this.getEntityLabel());
+    if (!confirmed) return;
+
+    try {
+      await this.medicalService.deleteEntry(id);
+      await this.alertService.success('delete', this.getEntityLabel());
+    } catch (error) {
+      console.error('Error deleting medical entry:', error);
+      await this.alertService.error('delete', this.getEntityLabel());
+    }
   }
 
   // ================= MODAL =================
@@ -165,6 +189,10 @@ export class MedicalRecordsComponent implements OnInit, OnDestroy {
       month: 'long',
       day: 'numeric'
     });
+  }
+
+  private getEntityLabel() {
+    return this.translation.getLanguage() === 'en' ? 'medical record' : 'registro medico';
   }
 
   // ================= DESTROY =================

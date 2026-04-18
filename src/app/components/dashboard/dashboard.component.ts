@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged, signOut } from '@angular/fire/auth';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '../../i18n/translate.pipe';
@@ -14,6 +14,9 @@ export class DashboardComponent implements OnInit {
   userName = '';
   userPhotoURL = '';
   currentLanguage: SupportedLang;
+  isSidebarOpen = false;
+  isSidebarCollapsed = false;
+  isMobile = false;
 
   private auth = inject(Auth);
   private router = inject(Router);
@@ -21,9 +24,11 @@ export class DashboardComponent implements OnInit {
 
   constructor() {
     this.currentLanguage = this.translation.getLanguage();
+    this.syncSidebarMode();
   }
 
   ngOnInit() {
+    this.syncSidebarMode();
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
         this.userName = user.displayName || this.translation.translate('sidebar.defaultUser');
@@ -41,12 +46,42 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  @HostListener('window:resize')
+  onWindowResize() {
+    this.syncSidebarMode();
+  }
+
   async logout() {
     try {
       await signOut(this.auth);
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('Error logging out:', error);
+    }
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    if (this.isMobile) {
+      this.isSidebarOpen = false;
+    }
+  }
+
+  toggleSidebarCollapsed() {
+    if (!this.isMobile) {
+      this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    }
+  }
+
+  private syncSidebarMode() {
+    this.isMobile = window.innerWidth < 992;
+    this.isSidebarOpen = !this.isMobile;
+
+    if (this.isMobile) {
+      this.isSidebarCollapsed = false;
     }
   }
 }

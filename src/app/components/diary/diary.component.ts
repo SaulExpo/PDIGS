@@ -8,6 +8,7 @@ import { PetsService } from "../../services/pets/pets.service";
 import { DiaryService } from "../../services/diary/diary.service";
 import { Subscription } from "rxjs";
 import { DiaryEntry, Pet } from "../../model/model.interface";
+import { AlertService } from '../../services/alert/alert.service';
 
 @Component({
   selector: 'app-diary',
@@ -20,6 +21,7 @@ export class DiaryComponent implements OnInit, OnDestroy {
   diaryEntries: DiaryEntry[] = [];
   private auth = inject(Auth);
   private translation = inject(TranslationService);
+  private alertService = inject(AlertService);
 
   selectedPetId: string | null = null;
   showForm = false;
@@ -96,34 +98,49 @@ export class DiaryComponent implements OnInit, OnDestroy {
   }
 
   async saveEntry() {
-    if (this.diaryForm.valid && this.selectedPetId) {
-      const formValue = this.diaryForm.value;
-      const entryData = {
-        petId: this.selectedPetId,
-        date: formValue.date!,
-        title: formValue.title!,
-        description: formValue.description!,
-        userId: this.auth.currentUser?.uid!
-      };
+    if (!this.diaryForm.valid || !this.selectedPetId) {
+      this.diaryForm.markAllAsTouched();
+      await this.alertService.validation(
+        'Completa correctamente todos los campos de la entrada.',
+        'Please fill in all entry fields correctly.'
+      );
+      return;
+    }
 
-      try {
-        if (this.isEditing && this.editingEntryId) {
-          await this.diaryService.updateDiaryEntry(this.editingEntryId, entryData);
-        } else {
-          await this.diaryService.addDiaryEntry(entryData);
-        }
-        this.cancelForm();
-      } catch (error) {
-        console.error('Error saving diary entry:', error);
+    const formValue = this.diaryForm.value;
+    const entryData = {
+      petId: this.selectedPetId,
+      date: formValue.date!,
+      title: formValue.title!,
+      description: formValue.description!,
+      userId: this.auth.currentUser?.uid!
+    };
+
+    try {
+      if (this.isEditing && this.editingEntryId) {
+        await this.diaryService.updateDiaryEntry(this.editingEntryId, entryData);
+        await this.alertService.success('update', this.getEntityLabel());
+      } else {
+        await this.diaryService.addDiaryEntry(entryData);
+        await this.alertService.success('create', this.getEntityLabel());
       }
+      this.cancelForm();
+    } catch (error) {
+      console.error('Error saving diary entry:', error);
+      await this.alertService.error('save', this.getEntityLabel());
     }
   }
 
   async deleteEntry(entryId: string) {
+    const confirmed = await this.alertService.confirmDelete(this.getEntityLabel());
+    if (!confirmed) return;
+
     try {
       await this.diaryService.deleteDiaryEntry(entryId);
+      await this.alertService.success('delete', this.getEntityLabel());
     } catch (error) {
       console.error('Error deleting diary entry:', error);
+      await this.alertService.error('delete', this.getEntityLabel());
     }
   }
 
@@ -152,6 +169,10 @@ export class DiaryComponent implements OnInit, OnDestroy {
     const date = new Date(dateString);
     const locale = this.translation.getLanguage() === 'en' ? 'en-US' : 'es-ES';
     return date.toLocaleDateString(locale, {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
+  }
+
+  private getEntityLabel() {
+    return this.translation.getLanguage() === 'en' ? 'entry' : 'entrada';
   }
 
   ngOnDestroy() {

@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs';
 import { PetsService } from '../../services/pets/pets.service';
 import { DiaryService } from '../../services/diary/diary.service';
 import { CalendarEventsService } from '../../services/calendar-events/calendar-events.service';
+import { AlertService } from '../../services/alert/alert.service';
 
 @Component({
   selector: 'app-calendar',
@@ -26,6 +27,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private petsService = inject(PetsService);
   private diaryService = inject(DiaryService);
   private calendarEventsService = inject(CalendarEventsService);
+  private alertService = inject(AlertService);
 
   currentUserId = '';
 
@@ -189,13 +191,19 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.clearMessages();
 
     if (this.eventForm.invalid) {
-      this.errorMessage = 'Please fill in all event fields correctly.';
       this.eventForm.markAllAsTouched();
+      await this.alertService.validation(
+        'Completa correctamente todos los campos del evento.',
+        'Please fill in all event fields correctly.'
+      );
       return;
     }
 
     if (!this.currentUserId) {
-      this.errorMessage = 'User session not found.';
+      await this.alertService.validation(
+        'No se ha encontrado la sesion del usuario.',
+        'User session not found.'
+      );
       return;
     }
 
@@ -223,15 +231,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
       ];
       this.updateCalendarEvents();
 
-      this.successMessage = 'Event created successfully.';
+      await this.alertService.success('create', this.getEntityLabel());
       this.cancelEventForm();
-
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
     } catch (error) {
       console.error('Error saving calendar event:', error);
-      this.errorMessage = 'An error occurred while saving the event.';
+      await this.alertService.error('save', this.getEntityLabel());
     } finally {
       this.isSavingEvent = false;
     }
@@ -265,11 +269,14 @@ export class CalendarComponent implements OnInit, OnDestroy {
     if (!this.selectedEventDetails) return;
 
     if (this.selectedEventDetails.source !== 'custom') {
-      this.errorMessage = 'Only custom events can be deleted.';
+      await this.alertService.validation(
+        'Solo se pueden eliminar los eventos personalizados.',
+        'Only custom events can be deleted.'
+      );
       return;
     }
 
-    const confirmed = window.confirm('Are you sure you want to delete this event?');
+    const confirmed = await this.alertService.confirmDelete(this.getEntityLabel());
     if (!confirmed) return;
 
     try {
@@ -282,15 +289,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
       this.closeModal();
       this.clearMessages();
-      this.successMessage = 'Event deleted successfully.';
-
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
+      await this.alertService.success('delete', this.getEntityLabel());
     } catch (error) {
       console.error('Error deleting calendar event:', error);
       this.clearMessages();
-      this.errorMessage = 'An error occurred while deleting the event.';
+      await this.alertService.error('delete', this.getEntityLabel());
     }
   }
 
@@ -306,5 +309,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
     if (this.petsSubscription) this.petsSubscription.unsubscribe();
     if (this.diarySubscription) this.diarySubscription.unsubscribe();
     if (this.customEventsSubscription) this.customEventsSubscription.unsubscribe();
+  }
+
+  private getEntityLabel() {
+    return this.translation.getLanguage() === 'en' ? 'event' : 'evento';
   }
 }

@@ -1,11 +1,11 @@
-<div class="calendar-page">
-  <div class="calendar-card">
-    <header class="calendar-header">
+<div class="app-page">
+  <div class="page-card calendar-card">
+    <header class="page-header">
       <h1>{{ 'calendar.title' | translate }}</h1>
       <p>{{ 'calendar.subtitle' | translate }}</p>
     </header>
 
-    <div class="calendar-body">
+    <div class="page-body calendar-body">
       @if (successMessage) {
         <div class="alert alert-success" role="alert">
           {{ successMessage }}
@@ -18,34 +18,34 @@
         </div>
       }
 
-      <button class="btn btn-primary mb-3" (click)="openCreateEventForm()">
-        New Event
+      <button class="btn btn-success mb-3" (click)="openCreateEventForm()">
+        {{ 'calendar.newEvent' | translate }}
       </button>
 
       @if (showEventForm) {
         <div class="card mb-4">
           <div class="card-header">
-            <h5>Create new calendar event</h5>
+            <h5>{{ 'calendar.createTitle' | translate }}</h5>
           </div>
 
           <div class="card-body">
             <form [formGroup]="eventForm" (ngSubmit)="saveCustomEvent()">
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label for="title" class="form-label">Title</label>
+                  <label for="title" class="form-label">{{ 'calendar.titleLabel' | translate }}</label>
                   <input id="title" type="text" class="form-control" formControlName="title">
 
                   @if (eventForm.get('title')?.invalid && eventForm.get('title')?.touched) {
                     <div class="text-danger small mt-1">
-                      Title is required.
+                      {{ 'calendar.titleLabel' | translate }} is required.
                     </div>
                   }
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label for="petId" class="form-label">Associated pet</label>
+                  <label for="petId" class="form-label">{{ 'calendar.petLabel' | translate }}</label>
                   <select id="petId" class="form-select" formControlName="petId">
-                    <option value="">Select a pet</option>
+                    <option value="">{{ 'calendar.selectPet' | translate }}</option>
                     @for (pet of pets; track pet.id) {
                       <option [value]="pet.id">{{ pet.name }}</option>
                     }
@@ -53,14 +53,14 @@
 
                   @if (eventForm.get('petId')?.invalid && eventForm.get('petId')?.touched) {
                     <div class="text-danger small mt-1">
-                      Please select a pet.
+                      {{ 'calendar.selectPet' | translate }}.
                     </div>
                   }
                 </div>
               </div>
 
               <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
+                <label for="description" class="form-label">{{ 'calendar.description' | translate }}</label>
                 <textarea
                   id="description"
                   class="form-control"
@@ -70,41 +70,41 @@
 
                 @if (eventForm.get('description')?.invalid && eventForm.get('description')?.touched) {
                   <div class="text-danger small mt-1">
-                    Description is required.
+                    {{ 'calendar.description' | translate }} is required.
                   </div>
                 }
               </div>
 
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label for="date" class="form-label">Date</label>
+                  <label for="date" class="form-label">{{ 'calendar.dateLabel' | translate }}</label>
                   <input id="date" type="date" class="form-control" formControlName="date">
 
                   @if (eventForm.get('date')?.invalid && eventForm.get('date')?.touched) {
                     <div class="text-danger small mt-1">
-                      Date is required.
+                      {{ 'calendar.dateLabel' | translate }} is required.
                     </div>
                   }
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label for="time" class="form-label">Time</label>
+                  <label for="time" class="form-label">{{ 'calendar.timeLabel' | translate }}</label>
                   <input id="time" type="time" class="form-control" formControlName="time">
 
                   @if (eventForm.get('time')?.invalid && eventForm.get('time')?.touched) {
                     <div class="text-danger small mt-1">
-                      Time is required.
+                      {{ 'calendar.timeLabel' | translate }} is required.
                     </div>
                   }
                 </div>
               </div>
 
               <button class="btn btn-primary me-2" type="submit" [disabled]="isSavingEvent">
-                {{ isSavingEvent ? 'Saving...' : 'Save Event' }}
+                {{ isSavingEvent ? ('calendar.saving' | translate) : ('calendar.save' | translate) }}
               </button>
 
               <button class="btn btn-secondary" type="button" (click)="cancelEventForm()">
-                Cancel
+                {{ 'calendar.close' | translate }}
               </button>
             </form>
           </div>
@@ -125,24 +125,24 @@
     role="dialog"
     tabindex="-1"
   >
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Event details</h5>
+          <h5 class="modal-title">{{ 'calendar.detailsTitle' | translate }}</h5>
           <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
         </div>
 
         @if (selectedEventDetails) {
           <div class="modal-body">
-            <p><strong>Title:</strong> {{ selectedEventDetails.title }}</p>
-            <p><strong>Description:</strong> {{ selectedEventDetails.description }}</p>
-            <p><strong>Date:</strong> {{ selectedEventDetails.date }}</p>
+            <p><strong>{{ 'calendar.titleLabel' | translate }}:</strong> {{ selectedEventDetails.title }}</p>
+            <p><strong>{{ 'calendar.description' | translate }}:</strong> {{ selectedEventDetails.description }}</p>
+            <p><strong>{{ 'calendar.dateLabel' | translate }}:</strong> {{ selectedEventDetails.date }}</p>
 
             @if (selectedEventDetails.time) {
-              <p><strong>Time:</strong> {{ selectedEventDetails.time }}</p>
+              <p><strong>{{ 'calendar.timeLabel' | translate }}:</strong> {{ selectedEventDetails.time }}</p>
             }
 
-            <p><strong>Pet:</strong> {{ selectedEventDetails.petName }}</p>
+            <p><strong>{{ 'calendar.petLabel' | translate }}:</strong> {{ selectedEventDetails.petName }}</p>
           </div>
         }
 
@@ -153,12 +153,12 @@
               class="btn btn-danger"
               (click)="deleteSelectedEvent()"
             >
-              Delete
+              {{ 'calendar.delete' | translate }}
             </button>
           }
 
           <button type="button" class="btn btn-secondary" (click)="closeModal()">
-            Close
+            {{ 'calendar.close' | translate }}
           </button>
         </div>
       </div>

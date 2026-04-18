@@ -7,6 +7,8 @@ import { Diet, Pet } from '../../model/model.interface';
 import { Subscription } from "rxjs";
 import { PetsService } from "../../services/pets/pets.service";
 import { DietsService } from "../../services/diets/diets.service";
+import { TranslationService } from '../../i18n/translation.service';
+import { AlertService } from '../../services/alert/alert.service';
 
 @Component({
   selector: 'app-diets',
@@ -30,6 +32,8 @@ export class DietsComponent implements OnInit, OnDestroy {
   });
   private petsService = inject(PetsService);
   private dietsService = inject(DietsService);
+  private translation = inject(TranslationService);
+  private alertService = inject(AlertService);
   private petsSubscription: Subscription | null = null;
   private dietsSubscription: Subscription | null = null;
 
@@ -88,25 +92,35 @@ export class DietsComponent implements OnInit, OnDestroy {
   }
 
   async saveDiet() {
-    if (this.dietForm.valid && this.selectedPetId) {
-      const formValue = this.dietForm.value;
-      const dietData = {
-        petId: this.selectedPetId,
-        name: formValue.name!,
-        description: formValue.description!,
-        userId: this.auth.currentUser?.uid || ''
-      };
+    if (!this.dietForm.valid || !this.selectedPetId) {
+      this.dietForm.markAllAsTouched();
+      await this.alertService.validation(
+        'Completa correctamente todos los campos de la dieta.',
+        'Please fill in all diet fields correctly.'
+      );
+      return;
+    }
 
-      try {
-        if (this.isEditing && this.editingDietId) {
-          await this.dietsService.updateDiet(this.editingDietId, dietData);
-        } else {
-          await this.dietsService.addDiet(dietData);
-        }
-        this.cancelForm();
-      } catch (error) {
-        console.error('Error saving diet:', error);
+    const formValue = this.dietForm.value;
+    const dietData = {
+      petId: this.selectedPetId,
+      name: formValue.name!,
+      description: formValue.description!,
+      userId: this.auth.currentUser?.uid || ''
+    };
+
+    try {
+      if (this.isEditing && this.editingDietId) {
+        await this.dietsService.updateDiet(this.editingDietId, dietData);
+        await this.alertService.success('update', this.getEntityLabel());
+      } else {
+        await this.dietsService.addDiet(dietData);
+        await this.alertService.success('create', this.getEntityLabel());
       }
+      this.cancelForm();
+    } catch (error) {
+      console.error('Error saving diet:', error);
+      await this.alertService.error('save', this.getEntityLabel());
     }
   }
 
@@ -116,11 +130,20 @@ export class DietsComponent implements OnInit, OnDestroy {
   }
 
   async deleteDiet(dietId: string) {
+    const confirmed = await this.alertService.confirmDelete(this.getEntityLabel());
+    if (!confirmed) return;
+
     try {
       await this.dietsService.deleteDiet(dietId);
+      await this.alertService.success('delete', this.getEntityLabel());
     } catch (error) {
       console.error('Error deleting diet:', error);
+      await this.alertService.error('delete', this.getEntityLabel());
     }
+  }
+
+  private getEntityLabel() {
+    return this.translation.getLanguage() === 'en' ? 'diet' : 'dieta';
   }
 
   ngOnDestroy() {

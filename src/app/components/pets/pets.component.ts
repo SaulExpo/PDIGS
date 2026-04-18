@@ -9,6 +9,7 @@ import { PetsService } from "../../services/pets/pets.service";
 import { Pet } from '../../model/model.interface';
 import { PetExportService } from '../../services/pet-export/pet-export.service';
 import { PdfExportService } from '../../services/pdf-export/pdf-export.service';
+import { AlertService } from '../../services/alert/alert.service';
 
 @Component({
   selector: 'app-pets',
@@ -22,6 +23,7 @@ export class PetsComponent implements OnInit, OnDestroy {
   private auth = inject(Auth);
   private petExportService = inject(PetExportService);
   private pdfExportService = inject(PdfExportService);
+  private alertService = inject(AlertService);
 
   showForm = false;
   isEditing = false;
@@ -69,17 +71,17 @@ export class PetsComponent implements OnInit, OnDestroy {
   }
 
   async deletePet(petId: string) {
+    const confirmed = await this.alertService.confirmDelete(this.getEntityLabel());
+    if (!confirmed) return;
+
     try {
       await this.petsService.deletePet(petId);
       this.clearMessages();
-      this.successMessage = 'Pet deleted successfully.';
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
+      await this.alertService.success('delete', this.getEntityLabel());
     } catch (error) {
       console.error('Error deleting pet:', error);
       this.clearMessages();
-      this.errorMessage = 'An error occurred while deleting the pet.';
+      await this.alertService.error('delete', this.getEntityLabel());
     }
   }
 
@@ -95,7 +97,7 @@ export class PetsComponent implements OnInit, OnDestroy {
       this.pdfExportService.exportPetData(exportData);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      this.errorMessage = 'There was an error generating the PDF.';
+      await this.alertService.error('export', 'PDF');
     } finally {
       this.isExporting = false;
     }
@@ -134,8 +136,11 @@ export class PetsComponent implements OnInit, OnDestroy {
     this.clearMessages();
 
     if (this.petForm.invalid) {
-      this.errorMessage = 'Please fill in all fields correctly.';
       this.petForm.markAllAsTouched();
+      await this.alertService.validation(
+        'Completa correctamente todos los campos.',
+        'Please fill in all fields correctly.'
+      );
       return;
     }
 
@@ -151,10 +156,10 @@ export class PetsComponent implements OnInit, OnDestroy {
     try {
       if (this.isEditing && this.editingPetId) {
         await this.petsService.updatePet(this.editingPetId, petData);
-        this.successMessage = 'Pet updated successfully.';
+        await this.alertService.success('update', this.getEntityLabel());
       } else {
         await this.petsService.addPet(petData);
-        this.successMessage = 'Pet created successfully.';
+        await this.alertService.success('create', this.getEntityLabel());
       }
 
       this.showForm = false;
@@ -162,13 +167,14 @@ export class PetsComponent implements OnInit, OnDestroy {
       this.isEditing = false;
       this.editingPetId = null;
 
-      setTimeout(() => {
-        this.successMessage = '';
-      }, 3000);
     } catch (error) {
       console.error('Error saving pet:', error);
-      this.errorMessage = 'An error occurred while saving the pet.';
+      await this.alertService.error('save', this.getEntityLabel());
     }
+  }
+
+  private getEntityLabel() {
+    return this.translation.getLanguage() === 'en' ? 'pet' : 'mascota';
   }
 
   openModal(pet: Pet) {
