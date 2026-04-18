@@ -6,7 +6,166 @@
     </header>
 
     <div class="calendar-body">
+      @if (successMessage) {
+        <div class="alert alert-success" role="alert">
+          {{ successMessage }}
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button class="btn btn-primary mb-3" (click)="openCreateEventForm()">
+        New Event
+      </button>
+
+      @if (showEventForm) {
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Create new calendar event</h5>
+          </div>
+
+          <div class="card-body">
+            <form [formGroup]="eventForm" (ngSubmit)="saveCustomEvent()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="title" class="form-label">Title</label>
+                  <input id="title" type="text" class="form-control" formControlName="title">
+
+                  @if (eventForm.get('title')?.invalid && eventForm.get('title')?.touched) {
+                    <div class="text-danger small mt-1">
+                      Title is required.
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="petId" class="form-label">Associated pet</label>
+                  <select id="petId" class="form-select" formControlName="petId">
+                    <option value="">Select a pet</option>
+                    @for (pet of pets; track pet.id) {
+                      <option [value]="pet.id">{{ pet.name }}</option>
+                    }
+                  </select>
+
+                  @if (eventForm.get('petId')?.invalid && eventForm.get('petId')?.touched) {
+                    <div class="text-danger small mt-1">
+                      Please select a pet.
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                  id="description"
+                  class="form-control"
+                  rows="3"
+                  formControlName="description"
+                ></textarea>
+
+                @if (eventForm.get('description')?.invalid && eventForm.get('description')?.touched) {
+                  <div class="text-danger small mt-1">
+                    Description is required.
+                  </div>
+                }
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="date" class="form-label">Date</label>
+                  <input id="date" type="date" class="form-control" formControlName="date">
+
+                  @if (eventForm.get('date')?.invalid && eventForm.get('date')?.touched) {
+                    <div class="text-danger small mt-1">
+                      Date is required.
+                    </div>
+                  }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="time" class="form-label">Time</label>
+                  <input id="time" type="time" class="form-control" formControlName="time">
+
+                  @if (eventForm.get('time')?.invalid && eventForm.get('time')?.touched) {
+                    <div class="text-danger small mt-1">
+                      Time is required.
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <button class="btn btn-primary me-2" type="submit" [disabled]="isSavingEvent">
+                {{ isSavingEvent ? 'Saving...' : 'Save Event' }}
+              </button>
+
+              <button class="btn btn-secondary" type="button" (click)="cancelEventForm()">
+                Cancel
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+
       <full-calendar [options]="calendarOptions"></full-calendar>
     </div>
   </div>
 </div>
+
+@if (showModal) {
+  <div
+    [ngClass]="{'show': modalVisible}"
+    [style.display]="showModal ? 'block' : 'none'"
+    aria-hidden="true"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+  >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Event details</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+
+        @if (selectedEventDetails) {
+          <div class="modal-body">
+            <p><strong>Title:</strong> {{ selectedEventDetails.title }}</p>
+            <p><strong>Description:</strong> {{ selectedEventDetails.description }}</p>
+            <p><strong>Date:</strong> {{ selectedEventDetails.date }}</p>
+
+            @if (selectedEventDetails.time) {
+              <p><strong>Time:</strong> {{ selectedEventDetails.time }}</p>
+            }
+
+            <p><strong>Pet:</strong> {{ selectedEventDetails.petName }}</p>
+          </div>
+        }
+
+        <div class="modal-footer">
+          @if (selectedEventDetails?.source === 'custom') {
+            <button
+              type="button"
+              class="btn btn-danger"
+              (click)="deleteSelectedEvent()"
+            >
+              Delete
+            </button>
+          }
+
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showModal) {
+  <div class="modal-backdrop fade show" (click)="closeModal()"></div>
+}
