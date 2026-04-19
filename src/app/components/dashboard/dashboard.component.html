@@ -82,16 +82,18 @@
   }
 
   <main class="dashboard-main">
-    <header class="dashboard-topbar">
-      <button
-        type="button"
-        class="sidebar-icon-btn d-lg-none"
-        (click)="toggleSidebar()"
-        [attr.aria-label]="'sidebar.openMenu' | translate"
-      >
-        |||
-      </button>
-    </header>
+    @if (isMobile) {
+      <header class="dashboard-topbar">
+        <button
+          type="button"
+          class="sidebar-icon-btn"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="'sidebar.openMenu' | translate"
+        >
+          ≡
+        </button>
+      </header>
+    }
 
     <div class="dashboard-content">
       <router-outlet></router-outlet>

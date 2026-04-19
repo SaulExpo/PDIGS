@@ -1,10 +1,17 @@
-import { Component, inject } from '@angular/core';
-import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from '@angular/fire/auth';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Auth,
+  authState,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
+} from '@angular/fire/auth';
 import { addDoc, collection, Firestore } from '@angular/fire/firestore';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { TranslationService } from '../../i18n/translation.service';
+import { Subscription } from "rxjs";
 
 @Component({
   selector: 'app-login',
@@ -12,7 +19,7 @@ import { TranslationService } from '../../i18n/translation.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, OnDestroy {
   isLogin = true;
   authErrorMessage = '';
   isSubmitting = false;
@@ -21,6 +28,16 @@ export class LoginComponent {
   private router = inject(Router);
   private firestore = inject(Firestore);
   private translation = inject(TranslationService);
+
+  private authSubscription?: Subscription;
+
+  ngOnInit() {
+    this.authSubscription = authState(this.auth).subscribe(user => {
+      if (user !== null) {
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -88,7 +105,7 @@ export class LoginComponent {
         username: username
       };
       await addDoc(collection(this.firestore, 'usuarios'), userDoc);
-      this.router.navigate(['/dashboard']);
+      // this.router.navigate(['/dashboard']);
     } catch (error) {
       console.error('Registration error:', error);
       this.authErrorMessage = this.getFirebaseErrorMessage(error);
@@ -146,5 +163,11 @@ export class LoginComponent {
     };
 
     return this.translation.translate(errorMap[code] ?? 'login.genericError');
+  }
+
+  ngOnDestroy(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 }

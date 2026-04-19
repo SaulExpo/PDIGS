@@ -30,9 +30,10 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.syncSidebarMode();
     onAuthStateChanged(this.auth, (user) => {
+      // TODO: disable observer -> add subscription and unsubscribe it when onDestroy()
       if (user) {
         this.userName = user.displayName || this.translation.translate('sidebar.defaultUser');
-        this.userPhotoURL = user.photoURL || 'https://via.placeholder.com/100';
+        this.userPhotoURL = user.photoURL || 'assets/user_image_placeholder.svg';
       } else {
         this.router.navigate(['/login']);
       }
