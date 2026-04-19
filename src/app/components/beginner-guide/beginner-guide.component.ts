@@ -25,11 +25,11 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
     {
       id: 'dog',
       label: 'Perros',
-      heroTitle: 'Cuidados basicos para un perro feliz',
+      heroTitle: 'Cuidados básicos para un perro feliz',
       heroDescription: 'Una rutina clara, paseos diarios y visitas veterinarias regulares ayudan a que tu perro se mantenga sano, activo y seguro.',
       quickTips: [
-        'Manten siempre agua fresca disponible.',
-        'Saca a pasear a tu perro todos los dias segun su energia y edad.',
+        'Mantén siempre agua fresca disponible.',
+        'Saca a pasear a tu perro todos los días según su energía y edad.',
         'Refuerza buenos comportamientos con paciencia y premios.'
       ],
       sections: [
@@ -39,14 +39,14 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           tips: [
             'Prepara un espacio tranquilo para dormir y descansar.',
             'Cumple con vacunas, desparasitaciones y chequeos preventivos.',
-            'Observa cambios en apetito, energia o comportamiento.'
+            'Observa cambios en apetito, energía o comportamiento.'
           ]
         },
         {
-          title: 'Nutricion',
+          title: 'Nutrición',
           icon: 'fa-utensils',
           tips: [
-            'Usa alimento adecuado para su tamano y etapa de vida.',
+            'Usa alimento adecuado para su tamaño y etapa de vida.',
             'Evita chocolate, cebolla, huesos cocidos y comida muy salada.',
             'Controla porciones para prevenir sobrepeso.'
           ]
@@ -56,8 +56,8 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           icon: 'fa-soap',
           tips: [
             'Cepilla el pelaje con frecuencia para reducir nudos y suciedad.',
-            'Bana solo cuando sea necesario usando productos para perros.',
-            'Revisa orejas, dientes y unas como parte de la rutina.'
+            'Baña solo cuando sea necesario usando productos para perros.',
+            'Revisa orejas, dientes y uñas como parte de la rutina.'
           ]
         }
       ]
@@ -68,7 +68,7 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
       heroTitle: 'Rutinas sencillas para cuidar a tu gato',
       heroDescription: 'Los gatos necesitan un ambiente limpio, enriquecido y seguro para mantenerse tranquilos, curiosos y saludables.',
       quickTips: [
-        'Limpia la caja de arena todos los dias.',
+        'Limpia la caja de arena todos los días.',
         'Ofrece zonas altas o escondites para que se sienta seguro.',
         'Reserva momentos cortos de juego interactivo.'
       ],
@@ -77,17 +77,17 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           title: 'Cuidado general',
           icon: 'fa-heart',
           tips: [
-            'Mantelo dentro de casa o en espacios protegidos.',
-            'Programa revisiones veterinarias y esterilizacion si corresponde.',
+            'Mantenlo dentro de casa o en espacios protegidos.',
+            'Programa revisiones veterinarias y esterilización si corresponde.',
             'Asegura ventanas, plantas y objetos peligrosos.'
           ]
         },
         {
-          title: 'Nutricion',
+          title: 'Nutrición',
           icon: 'fa-utensils',
           tips: [
-            'Elige comida formulada para gatos, rica en proteina animal.',
-            'Mantiene horarios estables para reducir ansiedad.',
+            'Elige comida formulada para gatos, rica en proteína animal.',
+            'Mantén horarios estables para reducir ansiedad.',
             'Evita leche, huesos y restos de comida humana.'
           ]
         },
@@ -95,9 +95,9 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           title: 'Higiene',
           icon: 'fa-soap',
           tips: [
-            'Cepilla el pelaje segun el tipo de pelo.',
-            'Mantiene limpia la caja de arena y alejada del comedero.',
-            'Vigila ojos, dientes y unas con frecuencia.'
+            'Cepilla el pelaje según el tipo de pelo.',
+            'Mantén limpia la caja de arena y alejada del comedero.',
+            'Vigila ojos, dientes y uñas con frecuencia.'
           ]
         }
       ]
@@ -105,8 +105,8 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
     {
       id: 'bird',
       label: 'Aves',
-      heroTitle: 'Bienestar diario para aves de compania',
-      heroDescription: 'Las aves requieren limpieza, estimulacion mental y una dieta equilibrada para evitar estres y problemas respiratorios.',
+      heroTitle: 'Bienestar diario para aves de compañía',
+      heroDescription: 'Las aves requieren limpieza, estimulación mental y una dieta equilibrada para evitar estrés y problemas respiratorios.',
       quickTips: [
         'Coloca la jaula en un lugar iluminado, sin corrientes fuertes.',
         'Cambia agua y restos de comida a diario.',
@@ -118,17 +118,17 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           icon: 'fa-heart',
           tips: [
             'Usa una jaula amplia que permita abrir alas y moverse.',
-            'Incluye juguetes y perchas de distintos tamanos.',
+            'Incluye juguetes y perchas de distintos tamaños.',
             'Evita humo, aerosoles y vapores fuertes cerca del ave.'
           ]
         },
         {
-          title: 'Nutricion',
+          title: 'Nutrición',
           icon: 'fa-utensils',
           tips: [
-            'Combina pellets o semillas con fruta y verdura segun la especie.',
-            'Investiga alimentos toxicos como aguacate o chocolate.',
-            'Retira comida fresca antes de que se estropee.'
+            'Combina pellets o semillas con fruta y verdura según la especie.',
+            'Investiga alimentos tóxicos como aguacate o chocolate.',
+            'Retira comida fresca antes de que se estropeé.'
           ]
         },
         {
@@ -136,8 +136,8 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           icon: 'fa-soap',
           tips: [
             'Limpia base, comederos y bebederos varias veces por semana.',
-            'Ofrece banos suaves o recipientes para que se aseen.',
-            'Observa plumas opacas o suciedad persistente como senal de alerta.'
+            'Ofrece baños suaves o recipientes para que se aseen.',
+            'Observa plumas opacas o suciedad persistente como señal de alerta.'
           ]
         }
       ]
@@ -146,7 +146,7 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
       id: 'reptile',
       label: 'Reptiles',
       heroTitle: 'Puntos clave para reptiles principiantes',
-      heroDescription: 'En reptiles, el habitat correcto es tan importante como la comida. Temperatura, luz y humedad deben estar controladas todos los dias.',
+      heroDescription: 'En reptiles, el hábitat correcto es tan importante como la comida. Temperatura, luz y humedad deben estar controladas todos los días.',
       quickTips: [
         'Comprueba temperatura y humedad con medidores confiables.',
         'Investiga si tu especie necesita luz UVB.',
@@ -157,18 +157,18 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           title: 'Cuidado general',
           icon: 'fa-heart',
           tips: [
-            'Adapta el terrario al tamano y comportamiento de la especie.',
-            'Incluye refugios, sustrato seguro y zonas fria/caliente.',
-            'Reduce el estres evitando ruido y manejo excesivo.'
+            'Adapta el terrario al tamaño y comportamiento de la especie.',
+            'Incluye refugios, sustrato seguro y zonas fría/caliente.',
+            'Reduce el estrés evitando ruido y manejo excesivo.'
           ]
         },
         {
-          title: 'Nutricion',
+          title: 'Nutrición',
           icon: 'fa-utensils',
           tips: [
             'Cada especie tiene una dieta distinta: insectos, vegetales o ambos.',
             'Suplementa calcio y vitaminas cuando el veterinario lo recomiende.',
-            'No dejes presas vivas sin supervision dentro del terrario.'
+            'No dejes presas vivas sin supervisión dentro del terrario.'
           ]
         },
         {
@@ -176,8 +176,8 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           icon: 'fa-soap',
           tips: [
             'Retira restos de comida y heces a diario.',
-            'Desinfecta accesorios y cambia el sustrato segun necesidad.',
-            'Lavate las manos antes y despues de manipular al reptil.'
+            'Desinfecta accesorios y cambia el sustrato según necesidad.',
+            'Lávate las manos antes y después de manipular al reptil.'
           ]
         }
       ]
@@ -208,7 +208,7 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           title: 'Nutrition',
           icon: 'fa-utensils',
           tips: [
-            'Use food that matches your dog size and life stage.',
+            'Use food that matches your dog\'s size and life stage.',
             'Avoid chocolate, onions, cooked bones, and very salty foods.',
             'Control portions to prevent unhealthy weight gain.'
           ]
@@ -329,7 +329,7 @@ const GUIDE_CONTENT: Record<SupportedLang, GuideSpeciesContent[]> = {
           icon: 'fa-utensils',
           tips: [
             'Each species has its own diet: insects, greens, or a mix.',
-            'Add calcium and vitamins only when appropriate for the species or vet advice.',
+            'Add calcium and vitamins only when appropriate for the species or per vet advice.',
             'Do not leave live prey unsupervised in the enclosure.'
           ]
         },
