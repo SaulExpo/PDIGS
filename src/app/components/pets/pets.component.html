@@ -121,7 +121,7 @@
                     class="btn btn-secondary btn-sm me-2"
                     [disabled]="isExporting"
                   >
-                    {{ isExporting ? 'Exporting...' : 'Export PDF' }}
+                    {{ isExporting ? 'Exporting...' : 'pets.exportPDF' | translate }}
                   </button>
 
                   <button (click)="deletePet(pet.id)" class="btn btn-danger btn-sm">
@@ -188,7 +188,7 @@
               (click)="exportPetToPdf(selectedPet)"
               [disabled]="isExporting"
             >
-              {{ isExporting ? 'Exporting...' : 'Export PDF' }}
+              {{ isExporting ? 'Exporting...' : 'pets.exportPDF' | translate }}
             </button>
           }
 

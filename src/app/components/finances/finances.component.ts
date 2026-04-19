@@ -78,18 +78,18 @@ export class FinancesComponent implements OnInit, OnDestroy {
   loadExpenses(petId: string) {
     this.finSub = this.financesService.getExpenses(petId)
       .subscribe(e => {
-        console.log('📦 RAW EXPENSES FROM DB:', e);
+        // console.log('📦 RAW EXPENSES FROM DB:', e);
 
         this.expenses = e;
 
-        console.log('📊 STATE BEFORE CHART');
-        console.log('selectedYear:', this.selectedYear);
-        console.log('selectedMonth:', this.selectedMonth);
+        // console.log('📊 STATE BEFORE CHART');
+        // console.log('selectedYear:', this.selectedYear);
+        // console.log('selectedMonth:', this.selectedMonth);
 
-        console.log('📊 PARSED DATES:');
-        e.forEach(x => {
-          console.log(x.date, new Date(x.date));
-        });
+        // console.log('📊 PARSED DATES:');
+        // e.forEach(x => {
+        //   console.log(x.date, new Date(x.date));
+        // });
 
         setTimeout(() => this.createChart(), 0);
       });
@@ -180,7 +180,7 @@ export class FinancesComponent implements OnInit, OnDestroy {
       );
     });
 
-    console.log('✅ FILTERED RESULT:', filtered);
+    // console.log('✅ FILTERED RESULT:', filtered);
 
     // 👉 clamp semana dentro del mes (IMPORTANTE)
     const getClampedWeekStart = (date: Date) => {

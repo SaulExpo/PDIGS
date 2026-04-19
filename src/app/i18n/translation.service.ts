@@ -81,8 +81,9 @@ const TRANSLATIONS: AppTranslations = {
     'pets.petId': 'ID de mascota',
     'pets.owner': 'Dueno',
     'pets.close': 'Cerrar',
-    'pets.ageYears': 'anos',
+    'pets.ageYears': 'años',
     'pets.actions': 'Acciones',
+    'pets.exportPDF': 'Exportar como PDF',
 
     'diets.title': 'Dietas de mascotas',
     'diets.subtitle': 'Gestiona planes de alimentacion por mascota.',
@@ -168,6 +169,8 @@ const TRANSLATIONS: AppTranslations = {
     'finances.editTitle': 'Editar entrada',
     'finances.cancel': 'Cancelar',
     'finances.createTitle': 'Crear entrada',
+    'finances.year': 'Año',
+    'finances.month': 'Mes',
 
     'guide.kicker': 'Guía esencial',
     'guide.title': 'Guía para el cuidado de mascotas',
@@ -255,6 +258,7 @@ const TRANSLATIONS: AppTranslations = {
     'pets.close': 'Close',
     'pets.ageYears': 'years',
     'pets.actions': 'Actions',
+    'pets.exportPDF': 'Export as PDF',
 
     'diets.title': 'Pet diets',
     'diets.subtitle': 'Manage meal plans per pet.',
@@ -341,6 +345,8 @@ const TRANSLATIONS: AppTranslations = {
     'finances.editTitle': 'Edit entry',
     'finances.createTitle': 'Create entry',
     'finances.cancel': 'Cancel',
+    'finances.year': 'Year',
+    'finances.month': 'Month',
 
     'guide.kicker': 'Essential guide',
     'guide.title': 'Pet care beginner guide',

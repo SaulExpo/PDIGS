@@ -126,7 +126,7 @@
               {{ 'finances.report' | translate }}
             </button>
 
-            <div class="row mb-3">
+            <div class="row mb-3 mt-3">
 
               <!-- AÑO -->
               <div class="col-md-6">
@@ -134,9 +134,11 @@
                 <select class="form-control"
                         [(ngModel)]="selectedYear"
                         (change)="onFilterChange()">
-                  <option *ngFor="let y of [2023,2024,2025,2026]" [value]="y">
-                    {{ y }}
-                  </option>
+                  @for (y of [2023, 2024, 2025, 2026]; track y) {
+                    <option [value]="y">
+                      {{ y }}
+                    </option>
+                  }
                 </select>
               </div>
 
