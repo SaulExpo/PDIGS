@@ -12,6 +12,7 @@
 
 # Environment variables
 .env
+env/
 
 # Nix & direnv config
 .envrc
