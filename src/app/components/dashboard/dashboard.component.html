@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <div class="dashboard-shell" [class.sidebar-collapsed]="isSidebarCollapsed && !isMobile">
   <aside
     class="dashboard-sidebar"
@@ -75,64 +74,9 @@
       <a class="nav-link text-white" (click)="logout()" style="cursor: pointer;">
         <i class="fas fa-sign-out-alt me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.logout' | translate }}</span>
       </a>
-=======
-<div class="dashboard-layout">
-  <div class="dashboard-sidebar bg-dark text-white p-3">
-    <div class="text-center mb-4">
-      <img [src]="userPhotoURL" [alt]="'sidebar.userPhotoAlt' | translate" class="rounded-circle mb-2 sidebar-avatar">
-      <h5>{{ userName }}</h5>
-    </div>
-
-    <nav class="nav flex-column sidebar-nav">
-      <div class="sidebar-links">
-        <a class="nav-link text-white" routerLink="pets" routerLinkActive="active">
-          <i class="fas fa-paw me-2"></i>{{ 'sidebar.pets' | translate }}
-        </a>
-        <a class="nav-link text-white" routerLink="diets" routerLinkActive="active">
-          <i class="fas fa-utensils me-2"></i>{{ 'sidebar.diets' | translate }}
-        </a>
-        <a class="nav-link text-white" routerLink="diary" routerLinkActive="active">
-          <i class="fas fa-book me-2"></i>{{ 'sidebar.diary' | translate }}
-        </a>
-        <a class="nav-link text-white" routerLink="medical-records" routerLinkActive="active">
-          <i class="fas fa-stethoscope me-2"></i>{{ 'sidebar.medicalRecords' | translate }}
-        </a>
-        <a class="nav-link text-white" routerLink="calendar" routerLinkActive="active">
-          <i class="fas fa-calendar me-2"></i>{{ 'sidebar.calendar' | translate }}
-        </a>
-        <a class="nav-link text-white" routerLink="map" routerLinkActive="active">
-          <i class="fas fa-map me-2"></i>{{ 'sidebar.map' | translate }}
-        </a>
-        <a class="nav-link text-white" routerLink="finances" routerLinkActive="active">
-          <i class="fas fa-dollar-sign me-2"></i>{{ 'sidebar.finances' | translate }}
-        </a>
-      </div>
-
-      <div class="sidebar-footer">
-        <hr class="my-3">
-
-        <div class="language-selector mb-3">
-          <label class="form-label text-uppercase small"
-                 for="sidebar-language">{{ 'sidebar.language' | translate }}</label>
-          <select
-            id="sidebar-language"
-            class="form-select form-select-sm"
-            [value]="currentLanguage"
-            (change)="setLanguage($any($event.target).value)">
-            <option value="es">{{ 'sidebar.lang.es' | translate }}</option>
-            <option value="en">{{ 'sidebar.lang.en' | translate }}</option>
-          </select>
-        </div>
-
-        <a class="nav-link text-white" (click)="logout()" style="cursor: pointer;">
-          <i class="fas fa-sign-out-alt me-2"></i>{{ 'sidebar.logout' | translate }}
-        </a>
-      </div>
->>>>>>> 7ed202f (beginners guide added)
     </nav>
   </aside>
 
-<<<<<<< HEAD
   @if (isMobile && isSidebarOpen) {
     <button type="button" class="sidebar-overlay" (click)="closeSidebar()" aria-hidden="true"></button>
   }
@@ -151,24 +95,19 @@
 
     <div class="dashboard-content">
       <router-outlet></router-outlet>
+
+      <a class="guide-access-button text-decoration-none" routerLink="guide" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="guide-access-icon">
+          <i class="fas fa-paw"></i>
+        </span>
+        <span class="guide-access-copy">
+          <small>{{ 'sidebar.guideBadge' | translate }}</small>
+          <strong>{{ 'sidebar.guide' | translate }}</strong>
+        </span>
+        <span class="guide-access-book">
+          <i class="fas fa-book-open"></i>
+        </span>
+      </a>
     </div>
   </main>
-=======
-  <div class="flex-grow-1 bg-light dashboard-main">
-    <router-outlet></router-outlet>
-
-    <a class="guide-access-button text-decoration-none" routerLink="guide" routerLinkActive="active">
-      <span class="guide-access-icon">
-        <i class="fas fa-paw"></i>
-      </span>
-      <span class="guide-access-copy">
-        <small>{{ 'sidebar.guideBadge' | translate }}</small>
-        <strong>{{ 'sidebar.guide' | translate }}</strong>
-      </span>
-      <span class="guide-access-book">
-        <i class="fas fa-book-open"></i>
-      </span>
-    </a>
-  </div>
->>>>>>> 7ed202f (beginners guide added)
 </div>
