@@ -24,7 +24,6 @@
           </div>
         </div>
 
-        <!-- MAIN -->
         @if (selectedPetId) {
           <div class="col-md-8">
 
@@ -126,6 +125,43 @@
             <button class="btn btn-outline-dark mt-2" (click)="generateReport()">
               {{ 'finances.report' | translate }}
             </button>
+
+            <div class="row mb-3">
+
+              <!-- AÑO -->
+              <div class="col-md-6">
+                <label class="form-label">{{ 'finances.year' | translate }}</label>
+                <select class="form-control"
+                        [(ngModel)]="selectedYear"
+                        (change)="onFilterChange()">
+                  <option *ngFor="let y of [2023,2024,2025,2026]" [value]="y">
+                    {{ y }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- MES -->
+              <div class="col-md-6">
+                <label class="form-label">{{ 'finances.month' | translate }}</label>
+                <select class="form-control"
+                        [(ngModel)]="selectedMonth"
+                        (change)="onFilterChange()">
+                  <option [value]="1">Enero</option>
+                  <option [value]="2">Febrero</option>
+                  <option [value]="3">Marzo</option>
+                  <option [value]="4">Abril</option>
+                  <option [value]="5">Mayo</option>
+                  <option [value]="6">Junio</option>
+                  <option [value]="7">Julio</option>
+                  <option [value]="8">Agosto</option>
+                  <option [value]="9">Septiembre</option>
+                  <option [value]="10">Octubre</option>
+                  <option [value]="11">Noviembre</option>
+                  <option [value]="12">Diciembre</option>
+                </select>
+              </div>
+
+            </div>
 
             <div class="mt-4 chart-container small-chart">
               <canvas #chartCanvas></canvas>

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { PetsService } from '../../services/pets/pets.service';
 import { FinancesService } from '../../services/finances/finances.service';
@@ -14,7 +14,7 @@ import jsPDF from 'jspdf';
 @Component({
   selector: 'app-finances',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe, FormsModule],
   templateUrl: './finances.component.html',
   styleUrl: './finances.component.css'
 })
@@ -24,6 +24,9 @@ export class FinancesComponent implements OnInit, OnDestroy {
   expenses: Expense[] = [];
 
   selectedPetId: string | null = null;
+
+  selectedYear: number = new Date().getFullYear();
+  selectedMonth: number = new Date().getMonth() + 1;
 
   showForm = false;
   isEditing = false;
@@ -66,10 +69,28 @@ export class FinancesComponent implements OnInit, OnDestroy {
     this.loadExpenses(petId);
   }
 
+  onFilterChange() {
+    if (this.selectedPetId) {
+      this.loadExpenses(this.selectedPetId);
+    }
+  }
+
   loadExpenses(petId: string) {
     this.finSub = this.financesService.getExpenses(petId)
       .subscribe(e => {
+        console.log('📦 RAW EXPENSES FROM DB:', e);
+
         this.expenses = e;
+
+        console.log('📊 STATE BEFORE CHART');
+        console.log('selectedYear:', this.selectedYear);
+        console.log('selectedMonth:', this.selectedMonth);
+
+        console.log('📊 PARSED DATES:');
+        e.forEach(x => {
+          console.log(x.date, new Date(x.date));
+        });
+
         setTimeout(() => this.createChart(), 0);
       });
   }
@@ -144,27 +165,84 @@ export class FinancesComponent implements OnInit, OnDestroy {
   createChart() {
     if (this.chart) {
       this.chart.destroy();
+      this.chart = undefined;
     }
 
-    const monthlyTotals: Record<string, number> = {};
+    const year = Number(this.selectedYear);
+    const month = Number(this.selectedMonth);
 
-    this.expenses.forEach(e => {
-      const date = new Date(e.date);
+    const filtered = this.expenses.filter(e => {
+      const d = new Date(e.date);
 
-      const month = date.toLocaleString('default', {
-        month: 'short',
-        year: 'numeric'
-      });
-
-      if (!monthlyTotals[month]) {
-        monthlyTotals[month] = 0;
-      }
-
-      monthlyTotals[month] += e.amount;
+      return (
+        d.getFullYear() === year &&
+        d.getMonth() + 1 === month
+      );
     });
 
-    const labels = Object.keys(monthlyTotals);
-    const data = Object.values(monthlyTotals);
+    console.log('✅ FILTERED RESULT:', filtered);
+
+    // 👉 clamp semana dentro del mes (IMPORTANTE)
+    const getClampedWeekStart = (date: Date) => {
+      const d = new Date(date);
+
+      const firstDayOfMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+
+      // lunes como inicio
+      const day = d.getDay();
+      const diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+
+      let weekStart = new Date(d.setDate(diffToMonday));
+
+      // 🔥 CLAMP: nunca antes del día 1 del mes
+      if (weekStart < firstDayOfMonth) {
+        weekStart = new Date(firstDayOfMonth);
+      }
+
+      return weekStart;
+    };
+
+    type WeekData = {
+      key: string;
+      label: string;
+      food: number;
+      vet: number;
+      grooming: number;
+      other: number;
+    };
+
+    const weekMap = new Map<string, WeekData>();
+
+    for (const e of filtered) {
+      const date = new Date(e.date);
+
+      const weekStart = getClampedWeekStart(date);
+
+      const key = weekStart.toISOString().split('T')[0];
+
+      const label = `${String(weekStart.getDate()).padStart(2, '0')}/${String(weekStart.getMonth() + 1).padStart(2, '0')}`;
+
+      if (!weekMap.has(key)) {
+        weekMap.set(key, {
+          key,
+          label,
+          food: 0,
+          vet: 0,
+          grooming: 0,
+          other: 0
+        });
+      }
+
+      const week = weekMap.get(key)!;
+
+      week[e.category] += Number(e.amount);
+    }
+
+    // 👉 orden real por fecha
+    const weekArray = Array.from(weekMap.values())
+      .sort((a, b) => a.key.localeCompare(b.key));
+
+    const labels = weekArray.map(w => w.label);
 
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
@@ -175,14 +253,44 @@ export class FinancesComponent implements OnInit, OnDestroy {
         labels,
         datasets: [
           {
-            label: '€ spent per month',
-            data
+            label: 'Food',
+            data: weekArray.map(w => w.food),
+            backgroundColor: '#4caf50'
+          },
+          {
+            label: 'Vet',
+            data: weekArray.map(w => w.vet),
+            backgroundColor: '#f44336'
+          },
+          {
+            label: 'Grooming',
+            data: weekArray.map(w => w.grooming),
+            backgroundColor: '#ff9800'
+          },
+          {
+            label: 'Other',
+            data: weekArray.map(w => w.other),
+            backgroundColor: '#9c27b0'
           }
         ]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        },
+        scales: {
+          x: {
+            stacked: true
+          },
+          y: {
+            stacked: true,
+            beginAtZero: true
+          }
+        }
       }
     });
   }

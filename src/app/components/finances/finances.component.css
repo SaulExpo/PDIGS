@@ -1,16 +1,19 @@
 .chart-container {
   width: 100%;
+  max-width: 650px;
+  height: 300px;
+  margin: 20px auto;
   display: flex;
   justify-content: center;
+}
+
+canvas {
+  width: 100% !important;
+  height: 300px !important;
 }
 
 .small-chart {
   max-width: 500px;
   height: 250px;
   margin: 0 auto;
-}
-
-canvas {
-  width: 100% !important;
-  height: 250px !important;
 }
