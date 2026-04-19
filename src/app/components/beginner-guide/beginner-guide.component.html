@@ -1,0 +1,82 @@
+<div class="app-page guide-page">
+  <div class="guide-book-shell">
+    <div class="guide-book-spine" aria-hidden="true"></div>
+    <div class="page-card guide-card">
+      <header class="page-header guide-header">
+        <div>
+          <span class="guide-kicker">{{ 'guide.kicker' | translate }}</span>
+          <h1>{{ 'guide.title' | translate }}</h1>
+          <p>{{ 'guide.subtitle' | translate }}</p>
+        </div>
+
+        <div class="guide-summary">
+          <div class="summary-item">
+            <strong>{{ speciesList.length }}</strong>
+            <span>{{ 'guide.summary.species' | translate }}</span>
+          </div>
+          <div class="summary-item">
+            <strong>3</strong>
+            <span>{{ 'guide.summary.sections' | translate }}</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-body guide-body">
+        <section class="species-selector" aria-label="Species selector">
+          @for (species of speciesList; track species.id) {
+            <button
+              type="button"
+              class="species-chip"
+              [class.active]="selectedSpecies.id === species.id"
+              (click)="selectSpecies(species.id)"
+            >
+              {{ species.label }}
+            </button>
+          }
+        </section>
+
+        <div
+          class="guide-page-content"
+          [class.page-turning]="isPageTurning"
+          [class.turn-forward]="turnDirection === 'forward'"
+          [class.turn-backward]="turnDirection === 'backward'"
+        >
+          <section class="guide-hero">
+            <div class="hero-copy">
+              <span class="hero-badge">{{ 'guide.hero.badge' | translate }}</span>
+              <h2>{{ selectedSpecies.heroTitle }}</h2>
+              <p>{{ selectedSpecies.heroDescription }}</p>
+            </div>
+
+            <div class="quick-tips-card">
+              <h3>{{ 'guide.quickTips' | translate }}</h3>
+              <ul>
+                @for (tip of selectedSpecies.quickTips; track tip) {
+                  <li>{{ tip }}</li>
+                }
+              </ul>
+            </div>
+          </section>
+
+          <section class="guide-sections">
+            @for (section of selectedSpecies.sections; track section.title) {
+              <article class="guide-section-card">
+                <div class="section-icon">
+                  <i class="fas" [ngClass]="section.icon"></i>
+                </div>
+                <div>
+                  <h3>{{ section.title }}</h3>
+                  <ul>
+                    @for (tip of section.tips; track tip) {
+                      <li>{{ tip }}</li>
+                    }
+                  </ul>
+                </div>
+              </article>
+            }
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

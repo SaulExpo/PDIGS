@@ -21,6 +21,8 @@ const TRANSLATIONS: AppTranslations = {
     'sidebar.calendar': 'Calendario',
     'sidebar.map': 'Mapa',
     'sidebar.finances': 'Finanzas',
+    'sidebar.guide': 'Guia para principiantes',
+    'sidebar.guideBadge': 'Abrir libro',
     'sidebar.logout': 'Cerrar sesion',
     'sidebar.language': 'Idioma',
     'sidebar.lang.es': 'Espanol',
@@ -152,6 +154,14 @@ const TRANSLATIONS: AppTranslations = {
     'finances.title': 'Finanzas',
     'finances.subtitle': 'Contenido de finanzas proximamente.',
 
+    'guide.kicker': 'Guia esencial',
+    'guide.title': 'Guia para el cuidado de mascotas',
+    'guide.subtitle': 'Consulta recomendaciones claras y faciles para empezar a cuidar mejor a tu mascota segun su especie.',
+    'guide.summary.species': 'especies cubiertas',
+    'guide.summary.sections': 'areas clave',
+    'guide.hero.badge': 'Consejos practicos',
+    'guide.quickTips': 'Recordatorios rapidos',
+
     'form.name': 'Nombre',
     'form.type': 'Tipo',
     'form.age': 'Edad',
@@ -168,6 +178,8 @@ const TRANSLATIONS: AppTranslations = {
     'sidebar.calendar': 'Calendar',
     'sidebar.map': 'Map',
     'sidebar.finances': 'Finances',
+    'sidebar.guide': 'Beginner Guide',
+    'sidebar.guideBadge': 'Open book',
     'sidebar.logout': 'Logout',
     'sidebar.language': 'Language',
     'sidebar.lang.es': 'Spanish',
@@ -299,6 +311,14 @@ const TRANSLATIONS: AppTranslations = {
 
     'finances.title': 'Finances',
     'finances.subtitle': 'Finance content coming soon.',
+
+    'guide.kicker': 'Essential guide',
+    'guide.title': 'Pet care beginner guide',
+    'guide.subtitle': 'Browse clear, friendly recommendations to start taking better care of your pet based on its species.',
+    'guide.summary.species': 'species covered',
+    'guide.summary.sections': 'key sections',
+    'guide.hero.badge': 'Practical tips',
+    'guide.quickTips': 'Quick reminders',
 
     'form.name': 'Name',
     'form.type': 'Type',

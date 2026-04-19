@@ -4,6 +4,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { DiaryComponent } from './components/diary/diary.component';
 import { DietsComponent } from './components/diets/diets.component';
 import { FinancesComponent } from './components/finances/finances.component';
+import { BeginnerGuideComponent } from './components/beginner-guide/beginner-guide.component';
 import { LoginComponent } from './components/login/login.component';
 import { MapComponent } from './components/map/map.component';
 import { MedicalRecordsComponent } from './components/medical-records/medical-records.component';
@@ -24,6 +25,7 @@ export const routes: Routes = [
       {path: 'calendar', component: CalendarComponent},
       {path: 'map', component: MapComponent},
       {path: 'finances', component: FinancesComponent},
+      {path: 'guide', component: BeginnerGuideComponent},
     ]
   },
 ];

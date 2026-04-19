@@ -1,0 +1,376 @@
+.guide-page {
+  background:
+    radial-gradient(circle at top left, rgba(255, 244, 214, 0.8), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(169, 224, 180, 0.55), transparent 28%),
+    linear-gradient(135deg, #fbf7ef, #edf7f0 55%, #e8f0ff);
+}
+
+.guide-card {
+  max-width: 1180px;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+  animation: bookOpen 0.7s ease both;
+  transform-origin: left center;
+}
+
+.guide-book-shell {
+  position: relative;
+  width: 100%;
+  max-width: 1210px;
+  padding-left: 1.25rem;
+}
+
+.guide-book-shell::before {
+  content: "";
+  position: absolute;
+  inset: 10px 0 10px 18px;
+  border-radius: 1.4rem;
+  background: linear-gradient(90deg, rgba(44, 29, 10, 0.18), rgba(255, 255, 255, 0.24));
+  filter: blur(10px);
+}
+
+.guide-book-spine {
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 0;
+  width: 34px;
+  border-radius: 1.2rem 0 0 1.2rem;
+  background: linear-gradient(180deg, #7a5532, #53361d 38%, #8c6740 100%);
+  box-shadow: inset -4px 0 10px rgba(0, 0, 0, 0.22), inset 4px 0 8px rgba(255, 255, 255, 0.18);
+  z-index: 1;
+}
+
+.guide-book-spine::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  right: 6px;
+  width: 2px;
+  background: rgba(255, 244, 214, 0.4);
+}
+
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.guide-kicker {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #fff1c2;
+  color: #8a6500;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-header h1 {
+  max-width: 14ch;
+  line-height: 0.95;
+  font-size: clamp(2.4rem, 5vw, 4.4rem);
+  color: #153a2f;
+}
+
+.guide-header p {
+  max-width: 60ch;
+  margin-top: 0.75rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #425a50;
+}
+
+.guide-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 1rem;
+  min-width: 240px;
+}
+
+.summary-item {
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, #153a2f, #245645);
+  color: #fff;
+  box-shadow: 0 12px 32px rgba(21, 58, 47, 0.18);
+}
+
+.summary-item strong {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.summary-item span {
+  display: block;
+  margin-top: 0.45rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.guide-body {
+  display: grid;
+  gap: 1.5rem;
+  max-height: none;
+  overflow: visible;
+}
+
+.guide-page-content {
+  display: grid;
+  gap: 1.5rem;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+.guide-page-content.page-turning.turn-forward {
+  animation: pageTurnForward 0.7s ease;
+}
+
+.guide-page-content.page-turning.turn-backward {
+  animation: pageTurnBackward 0.7s ease;
+}
+
+.species-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.species-chip {
+  border: 1px solid rgba(21, 58, 47, 0.14);
+  background: #fff;
+  color: #26453c;
+  padding: 0.85rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.species-chip:hover,
+.species-chip.active {
+  background: #153a2f;
+  border-color: #153a2f;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.guide-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
+  gap: 1.25rem;
+}
+
+.hero-copy {
+  padding: 1.75rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(21, 58, 47, 0.08);
+}
+
+.hero-badge {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: #ddeee2;
+  color: #245645;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hero-copy h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  color: #153a2f;
+}
+
+.hero-copy p {
+  margin: 1rem 0 0;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #425a50;
+}
+
+.quick-tips-card {
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  background: #fffaf0;
+  border: 1px solid rgba(138, 101, 0, 0.16);
+}
+
+.quick-tips-card h3 {
+  margin: 0 0 1rem;
+  color: #8a6500;
+  font-size: 1.15rem;
+}
+
+.quick-tips-card ul,
+.guide-section-card ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.quick-tips-card li,
+.guide-section-card li {
+  margin-bottom: 0.85rem;
+  line-height: 1.65;
+  color: #384842;
+}
+
+.guide-sections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.guide-section-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.4rem;
+  border-radius: 1.35rem;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(21, 58, 47, 0.08);
+  min-height: 100%;
+}
+
+.section-icon {
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #153a2f, #2f7a61);
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.guide-section-card h3 {
+  margin: 0 0 0.9rem;
+  color: #153a2f;
+  font-size: 1.15rem;
+}
+
+@keyframes bookOpen {
+  0% {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-16deg) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(0deg) scale(1);
+  }
+}
+
+@keyframes pageTurnForward {
+  0% {
+    opacity: 0.92;
+    transform: perspective(1600px) rotateY(0deg) translateX(0);
+    filter: brightness(1);
+  }
+
+  40% {
+    opacity: 0.72;
+    transform: perspective(1600px) rotateY(-18deg) translateX(8px);
+    filter: brightness(0.95);
+  }
+
+  70% {
+    opacity: 0.82;
+    transform: perspective(1600px) rotateY(10deg) translateX(-4px);
+    filter: brightness(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1600px) rotateY(0deg) translateX(0);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pageTurnBackward {
+  0% {
+    opacity: 0.92;
+    transform: perspective(1600px) rotateY(0deg) translateX(0);
+    filter: brightness(1);
+  }
+
+  40% {
+    opacity: 0.72;
+    transform: perspective(1600px) rotateY(18deg) translateX(-8px);
+    filter: brightness(0.95);
+  }
+
+  70% {
+    opacity: 0.82;
+    transform: perspective(1600px) rotateY(-10deg) translateX(4px);
+    filter: brightness(1.02);
+  }
+
+  100% {
+    opacity: 1;
+    transform: perspective(1600px) rotateY(0deg) translateX(0);
+    filter: brightness(1);
+  }
+}
+
+@media (max-width: 991px) {
+  .guide-header,
+  .guide-hero,
+  .guide-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-header {
+    flex-direction: column;
+  }
+
+  .guide-summary {
+    width: 100%;
+  }
+
+  .guide-book-shell {
+    padding-left: 0.8rem;
+  }
+
+  .guide-book-spine {
+    width: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .guide-card {
+    padding: 1.2rem;
+  }
+
+  .guide-book-shell {
+    padding-left: 0;
+  }
+
+  .guide-book-shell::before,
+  .guide-book-spine {
+    display: none;
+  }
+
+  .guide-header h1 {
+    max-width: none;
+  }
+
+  .species-chip {
+    width: 100%;
+    text-align: left;
+  }
+
+  .guide-section-card {
+    flex-direction: column;
+  }
+}
