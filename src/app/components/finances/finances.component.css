@@ -1,0 +1,16 @@
+.chart-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.small-chart {
+  max-width: 500px;
+  height: 250px;
+  margin: 0 auto;
+}
+
+canvas {
+  width: 100% !important;
+  height: 250px !important;
+}

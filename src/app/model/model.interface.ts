@@ -51,3 +51,16 @@ export interface CalendarEventEntry {
   petId: string;
   userId: string;
 }
+
+export interface Expense {
+  id: string;
+  petId: string;
+  userId: string;
+  date: string;
+
+  amount: number;
+
+  category: 'food' | 'vet' | 'grooming' | 'other';
+
+  description: string;
+}
