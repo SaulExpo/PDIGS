@@ -12,15 +12,27 @@ import {
 } from "@angular/fire/firestore";
 import { Observable } from 'rxjs';
 import { MedicalEntry } from "../../model/model.interface";
+import { Auth } from "@angular/fire/auth";
 
 @Injectable({ providedIn: 'root' })
 export class MedicalService {
   private firestore = inject(Firestore);
+  private auth = inject(Auth);
 
   getEntries(petId: string): Observable<MedicalEntry[]> {
     return new Observable(observer => {
       const ref = collection(this.firestore, 'medical');
-      const q = query(ref, where('petId', '==', petId));
+      const currentUser = this.auth.currentUser;
+      if (!currentUser) {
+        observer.error(Error('User not authenticated'));
+        return;
+      }
+
+      const q = query(
+        ref,
+        where('userId', '==', currentUser.uid),
+        where('petId', '==', petId)
+      );
 
       const unsub = onSnapshot(q, snap => {
         const data = snap.docs.map(doc => ({

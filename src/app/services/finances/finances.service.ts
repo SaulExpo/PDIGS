@@ -12,6 +12,7 @@ import {
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { Expense } from '../../model/model.interface';
+import { Auth } from "@angular/fire/auth";
 
 @Injectable({
   providedIn: 'root',
@@ -19,11 +20,22 @@ import { Expense } from '../../model/model.interface';
 export class FinancesService {
 
   private firestore = inject(Firestore);
+  private auth = inject(Auth);
 
   getExpenses(petId: string): Observable<Expense[]> {
     return new Observable<Expense[]>((observer) => {
       const ref = collection(this.firestore, 'finances');
-      const q = query(ref, where('petId', '==', petId));
+      const currentUser = this.auth.currentUser;
+      if (!currentUser) {
+        observer.error(Error('User not authenticated'));
+        return;
+      }
+
+      const q = query(
+        ref,
+        where('userId', '==', currentUser.uid),
+        where('petId', '==', petId)
+      );
 
       const unsubscribe = onSnapshot(q, (snapshot) => {
         const expenses = snapshot.docs.map(doc => ({

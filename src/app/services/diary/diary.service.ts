@@ -12,17 +12,29 @@ import {
 } from "@angular/fire/firestore";
 import { Observable } from 'rxjs';
 import { DiaryEntry } from "../../model/model.interface";
+import { Auth } from "@angular/fire/auth";
 
 @Injectable({
   providedIn: 'root',
 })
 export class DiaryService {
   private firestore = inject(Firestore);
+  private auth = inject(Auth);
 
   getDiaryEntries(petId: string): Observable<DiaryEntry[]> {
     return new Observable<DiaryEntry[]>((observer) => {
       const diaryRef = collection(this.firestore, 'diary');
-      const q = query(diaryRef, where('petId', '==', petId));
+      const currentUser = this.auth.currentUser;
+      if (!currentUser) {
+        observer.error(Error('User not authenticated'));
+        return;
+      }
+
+      const q = query(
+        diaryRef,
+        where('userId', '==', currentUser.uid),
+        where('petId', '==', petId)
+      );
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const entries = querySnapshot.docs.map(doc => ({
