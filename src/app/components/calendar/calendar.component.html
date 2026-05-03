@@ -25,7 +25,7 @@
       @if (showEventForm) {
         <div class="card mb-4">
           <div class="card-header">
-            <h5>{{ 'calendar.createTitle' | translate }}</h5>
+            <h5>{{ (isEditingEvent ? 'calendar.editTitle' : 'calendar.createTitle') | translate }}</h5>
           </div>
 
           <div class="card-body">
@@ -99,6 +99,44 @@
                 </div>
               </div>
 
+              <div class="reminder-panel">
+                <div class="form-check form-switch mb-3">
+                  <input
+                    id="hasReminder"
+                    class="form-check-input"
+                    type="checkbox"
+                    formControlName="hasReminder"
+                  >
+                  <label class="form-check-label" for="hasReminder">
+                    {{ 'calendar.reminderToggle' | translate }}
+                  </label>
+                </div>
+
+                @if (eventForm.get('hasReminder')?.value) {
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="reminderDate" class="form-label">{{ 'calendar.reminderDateLabel' | translate }}</label>
+                      <input id="reminderDate" type="date" class="form-control" formControlName="reminderDate">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label for="reminderTime" class="form-label">{{ 'calendar.reminderTimeLabel' | translate }}</label>
+                      <input id="reminderTime" type="time" class="form-control" formControlName="reminderTime">
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="reminderMessage" class="form-label">{{ 'calendar.reminderMessageLabel' | translate }}</label>
+                    <textarea
+                      id="reminderMessage"
+                      class="form-control"
+                      rows="2"
+                      formControlName="reminderMessage"
+                    ></textarea>
+                  </div>
+                }
+              </div>
+
               <button class="btn btn-primary me-2" type="submit" [disabled]="isSavingEvent">
                 {{ isSavingEvent ? ('calendar.saving' | translate) : ('calendar.save' | translate) }}
               </button>
@@ -143,10 +181,41 @@
             }
 
             <p><strong>{{ 'calendar.petLabel' | translate }}:</strong> {{ selectedEventDetails.petName }}</p>
+
+            @if (selectedEventDetails.hasReminder) {
+              <hr>
+              <p><strong>{{ 'calendar.reminderDetails' | translate }}:</strong></p>
+              <p><strong>{{ 'calendar.reminderDateLabel' | translate }}:</strong> {{ selectedEventDetails.reminderDate }}</p>
+              <p><strong>{{ 'calendar.reminderTimeLabel' | translate }}:</strong> {{ selectedEventDetails.reminderTime }}</p>
+
+              @if (selectedEventDetails.reminderMessage) {
+                <p><strong>{{ 'calendar.reminderMessageLabel' | translate }}:</strong> {{ selectedEventDetails.reminderMessage }}</p>
+              }
+            }
           </div>
         }
 
         <div class="modal-footer">
+          @if (selectedEventDetails?.source === 'custom' && selectedEventDetails?.hasReminder) {
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="openEditReminderForm()"
+            >
+              {{ 'calendar.editReminder' | translate }}
+            </button>
+          }
+
+          @if (selectedEventDetails?.source === 'custom' && selectedEventDetails?.hasReminder) {
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              (click)="deleteSelectedReminder()"
+            >
+              {{ 'calendar.deleteReminder' | translate }}
+            </button>
+          }
+
           @if (selectedEventDetails?.source === 'custom') {
             <button
               type="button"

@@ -14,6 +14,7 @@ import { PetsService } from '../../services/pets/pets.service';
 import { DiaryService } from '../../services/diary/diary.service';
 import { CalendarEventsService } from '../../services/calendar-events/calendar-events.service';
 import { AlertService } from '../../services/alert/alert.service';
+import { ReminderNotificationsService } from '../../services/reminder-notifications/reminder-notifications.service';
 
 @Component({
   selector: 'app-calendar',
@@ -28,6 +29,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   private diaryService = inject(DiaryService);
   private calendarEventsService = inject(CalendarEventsService);
   private alertService = inject(AlertService);
+  private reminderNotifications = inject(ReminderNotificationsService);
 
   currentUserId = '';
 
@@ -44,6 +46,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
   pets: Pet[] = [];
 
   showEventForm = false;
+  isEditingEvent = false;
+  editingEventId: string | null = null;
   isSavingEvent = false;
   showModal = false;
   modalVisible = false;
@@ -55,6 +59,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
     petName: string;
     date: string;
     time: string;
+    hasReminder: boolean;
+    reminderDate: string;
+    reminderTime: string;
+    reminderMessage: string;
   } | null = null;
 
   successMessage = '';
@@ -65,7 +73,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
     description: new FormControl('', Validators.required),
     date: new FormControl('', Validators.required),
     time: new FormControl('', Validators.required),
-    petId: new FormControl('', Validators.required)
+    petId: new FormControl('', Validators.required),
+    hasReminder: new FormControl(false, { nonNullable: true }),
+    reminderDate: new FormControl(''),
+    reminderTime: new FormControl(''),
+    reminderMessage: new FormControl('')
   });
 
   private petsSubscription: Subscription | null = null;
@@ -151,7 +163,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
           description: event.description,
           petName: pet?.name || petFallback,
           time: event.time,
-          source: 'custom'
+          source: 'custom',
+          hasReminder: !!event.hasReminder,
+          reminderDate: event.reminderDate || '',
+          reminderTime: event.reminderTime || '',
+          reminderMessage: event.reminderMessage || ''
         }
       };
     });
@@ -170,16 +186,24 @@ export class CalendarComponent implements OnInit, OnDestroy {
   openCreateEventForm(selectedDate?: string) {
     this.clearMessages();
     this.eventForm.reset();
+    this.isEditingEvent = false;
+    this.editingEventId = null;
     this.eventForm.patchValue({
       date: selectedDate || new Date().toISOString().split('T')[0],
       time: '09:00',
-      petId: this.pets.length ? this.pets[0].id : ''
+      petId: this.pets.length ? this.pets[0].id : '',
+      hasReminder: false,
+      reminderDate: '',
+      reminderTime: '',
+      reminderMessage: ''
     });
     this.showEventForm = true;
   }
 
   cancelEventForm() {
     this.showEventForm = false;
+    this.isEditingEvent = false;
+    this.editingEventId = null;
     this.eventForm.reset();
   }
 
@@ -208,6 +232,49 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.eventForm.value;
+    const hasReminder = !!formValue.hasReminder;
+
+    if (hasReminder) {
+      const permission = await this.reminderNotifications.ensurePermission();
+
+      if (permission === 'denied') {
+        await this.alertService.validation(
+          'El navegador tiene bloqueadas las notificaciones. Activalas para que el recordatorio avise a la hora indicada.',
+          'Browser notifications are blocked. Enable them so the reminder can alert you at the scheduled time.'
+        );
+      }
+
+      if (permission === 'unsupported') {
+        await this.alertService.validation(
+          'Este navegador no soporta notificaciones del sistema. El recordatorio se guardara, pero no podra avisarte automaticamente.',
+          'This browser does not support system notifications. The reminder will be saved, but it will not alert you automatically.'
+        );
+      }
+    }
+
+    if (hasReminder && (!formValue.reminderDate || !formValue.reminderTime)) {
+      await this.alertService.validation(
+        'Completa la fecha y la hora del recordatorio.',
+        'Please fill in the reminder date and time.'
+      );
+      return;
+    }
+
+    if (
+      hasReminder &&
+      !this.isReminderScheduledBeforeEvent(
+        formValue.date!,
+        formValue.time!,
+        formValue.reminderDate!,
+        formValue.reminderTime!
+      )
+    ) {
+      await this.alertService.validation(
+        'El recordatorio debe programarse antes o a la misma hora que el evento.',
+        'The reminder must be scheduled before or at the same time as the event.'
+      );
+      return;
+    }
 
     const eventData = {
       title: formValue.title!,
@@ -215,23 +282,61 @@ export class CalendarComponent implements OnInit, OnDestroy {
       date: formValue.date!,
       time: formValue.time!,
       petId: formValue.petId!,
-      userId: this.currentUserId
+      userId: this.currentUserId,
+      hasReminder,
+      reminderDate: hasReminder ? formValue.reminderDate! : '',
+      reminderTime: hasReminder ? formValue.reminderTime! : '',
+      reminderMessage: hasReminder ? (formValue.reminderMessage || '').trim() : ''
     };
 
     try {
       this.isSavingEvent = true;
-      const newId = await this.calendarEventsService.addCalendarEvent(eventData);
+      if (this.isEditingEvent && this.editingEventId) {
+        await this.calendarEventsService.updateCalendarEvent(this.editingEventId, eventData);
 
-      this.customEvents = [
-        ...this.customEvents,
-        {
-          id: newId,
-          ...eventData
+        this.customEvents = this.customEvents.map(event =>
+          event.id === this.editingEventId
+            ? {
+                ...event,
+                ...eventData
+              }
+            : event
+        );
+
+        if (this.selectedEventDetails?.id === this.editingEventId) {
+          const petName = this.pets.find(pet => pet.id === eventData.petId)?.name
+            || this.translation.translate('calendar.petFallback');
+
+          this.selectedEventDetails = {
+            ...this.selectedEventDetails,
+            title: eventData.title,
+            description: eventData.description,
+            date: eventData.date,
+            time: eventData.time,
+            petName,
+            hasReminder: eventData.hasReminder,
+            reminderDate: eventData.reminderDate,
+            reminderTime: eventData.reminderTime,
+            reminderMessage: eventData.reminderMessage
+          };
         }
-      ];
-      this.updateCalendarEvents();
 
-      await this.alertService.success('create', this.getEntityLabel());
+        await this.alertService.success('update', this.getEntityLabel());
+      } else {
+        const newId = await this.calendarEventsService.addCalendarEvent(eventData);
+
+        this.customEvents = [
+          ...this.customEvents,
+          {
+            id: newId,
+            ...eventData
+          }
+        ];
+
+        await this.alertService.success('create', this.getEntityLabel());
+      }
+
+      this.updateCalendarEvents();
       this.cancelEventForm();
     } catch (error) {
       console.error('Error saving calendar event:', error);
@@ -256,13 +361,46 @@ export class CalendarComponent implements OnInit, OnDestroy {
       date: event.start
         ? event.start.toISOString().split('T')[0]
         : '',
-      time: event.extendedProps['time'] || ''
+      time: event.extendedProps['time'] || '',
+      hasReminder: !!event.extendedProps['hasReminder'],
+      reminderDate: event.extendedProps['reminderDate'] || '',
+      reminderTime: event.extendedProps['reminderTime'] || '',
+      reminderMessage: event.extendedProps['reminderMessage'] || ''
     };
 
     this.showModal = true;
     setTimeout(() => {
       this.modalVisible = true;
     }, 10);
+  }
+
+  openEditReminderForm() {
+    if (!this.selectedEventDetails || this.selectedEventDetails.source !== 'custom') {
+      return;
+    }
+
+    const eventToEdit = this.customEvents.find(event => event.id === this.selectedEventDetails?.id);
+    if (!eventToEdit) {
+      return;
+    }
+
+    this.eventForm.reset();
+    this.eventForm.patchValue({
+      title: eventToEdit.title,
+      description: eventToEdit.description,
+      date: eventToEdit.date,
+      time: eventToEdit.time,
+      petId: eventToEdit.petId,
+      hasReminder: !!eventToEdit.hasReminder,
+      reminderDate: eventToEdit.reminderDate || '',
+      reminderTime: eventToEdit.reminderTime || '',
+      reminderMessage: eventToEdit.reminderMessage || ''
+    });
+
+    this.isEditingEvent = true;
+    this.editingEventId = eventToEdit.id;
+    this.showEventForm = true;
+    this.closeModal();
   }
 
   async deleteSelectedEvent() {
@@ -297,6 +435,53 @@ export class CalendarComponent implements OnInit, OnDestroy {
     }
   }
 
+  async deleteSelectedReminder() {
+    if (!this.selectedEventDetails) return;
+
+    if (this.selectedEventDetails.source !== 'custom' || !this.selectedEventDetails.hasReminder) {
+      await this.alertService.validation(
+        'Solo se pueden eliminar recordatorios de eventos personalizados.',
+        'Only reminders from custom events can be deleted.'
+      );
+      return;
+    }
+
+    const confirmed = await this.alertService.confirmDelete(this.getReminderEntityLabel());
+    if (!confirmed) return;
+
+    try {
+      const eventId = this.selectedEventDetails.id;
+      const reminderUpdate = {
+        hasReminder: false,
+        reminderDate: '',
+        reminderTime: '',
+        reminderMessage: ''
+      };
+
+      await this.calendarEventsService.updateCalendarEvent(eventId, reminderUpdate);
+
+      this.customEvents = this.customEvents.map(event =>
+        event.id === eventId
+          ? {
+              ...event,
+              ...reminderUpdate
+            }
+          : event
+      );
+
+      this.selectedEventDetails = {
+        ...this.selectedEventDetails,
+        ...reminderUpdate
+      };
+
+      this.updateCalendarEvents();
+      await this.alertService.success('delete', this.getReminderEntityLabel());
+    } catch (error) {
+      console.error('Error deleting reminder:', error);
+      await this.alertService.error('delete', this.getReminderEntityLabel());
+    }
+  }
+
   closeModal() {
     this.modalVisible = false;
     setTimeout(() => {
@@ -313,5 +498,21 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   private getEntityLabel() {
     return this.translation.getLanguage() === 'en' ? 'event' : 'evento';
+  }
+
+  private getReminderEntityLabel() {
+    return this.translation.getLanguage() === 'en' ? 'reminder' : 'recordatorio';
+  }
+
+  private isReminderScheduledBeforeEvent(
+    eventDate: string,
+    eventTime: string,
+    reminderDate: string,
+    reminderTime: string
+  ) {
+    const eventDateTime = new Date(`${eventDate}T${eventTime}`);
+    const reminderDateTime = new Date(`${reminderDate}T${reminderTime}`);
+
+    return reminderDateTime.getTime() <= eventDateTime.getTime();
   }
 }

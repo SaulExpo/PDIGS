@@ -3,6 +3,7 @@ import { Auth, onAuthStateChanged, signOut } from '@angular/fire/auth';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { SupportedLang, TranslationService } from '../../i18n/translation.service';
+import { ReminderNotificationsService } from '../../services/reminder-notifications/reminder-notifications.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,6 +22,7 @@ export class DashboardComponent implements OnInit {
   private auth = inject(Auth);
   private router = inject(Router);
   private translation = inject(TranslationService);
+  private reminderNotifications = inject(ReminderNotificationsService);
 
   constructor() {
     this.currentLanguage = this.translation.getLanguage();
@@ -34,7 +36,9 @@ export class DashboardComponent implements OnInit {
       if (user) {
         this.userName = user.displayName || this.translation.translate('sidebar.defaultUser');
         this.userPhotoURL = user.photoURL || 'assets/user_image_placeholder.svg';
+        this.reminderNotifications.start(user.uid);
       } else {
+        this.reminderNotifications.stop();
         this.router.navigate(['/login']);
       }
     });

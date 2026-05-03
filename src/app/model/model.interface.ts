@@ -50,6 +50,10 @@ export interface CalendarEventEntry {
   time: string;
   petId: string;
   userId: string;
+  hasReminder?: boolean;
+  reminderDate?: string;
+  reminderTime?: string;
+  reminderMessage?: string;
 }
 
 export interface Expense {

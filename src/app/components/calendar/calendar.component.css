@@ -50,6 +50,14 @@
   text-decoration: none;
 }
 
+.reminder-panel {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid rgba(20, 61, 42, 0.08);
+  border-radius: 1rem;
+  background: rgba(247, 251, 248, 0.9);
+}
+
 @media (max-width: 768px) {
   .calendar-body {
     padding-right: 0;

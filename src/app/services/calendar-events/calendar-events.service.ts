@@ -7,6 +7,7 @@ import {
   Firestore,
   onSnapshot,
   query,
+  updateDoc,
   where
 } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
@@ -45,6 +46,11 @@ export class CalendarEventsService {
   async addCalendarEvent(eventData: Omit<CalendarEventEntry, 'id'>): Promise<string> {
     const docRef = await addDoc(collection(this.firestore, 'calendar_events'), eventData);
     return docRef.id;
+  }
+
+  async updateCalendarEvent(eventId: string, eventData: Partial<CalendarEventEntry>): Promise<void> {
+    const docReference = doc(this.firestore, 'calendar_events', eventId);
+    await updateDoc(docReference, eventData);
   }
 
   async deleteCalendarEvent(eventId: string): Promise<void> {
