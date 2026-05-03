@@ -8,15 +8,19 @@
     <div class="page-body">
       <div class="row">
         <div class="col-md-4">
-          <h3>{{ 'diets.selectPet' | translate }}</h3>
-          <div class="list-group">
+          <h3 class="pet-selector-title">{{ 'diets.selectPet' | translate }}</h3>
+          <div class="pet-selector">
             @for (pet of pets; track pet) {
               <button
                 type="button"
-                class="list-group-item list-group-item-action"
+                class="pet-option"
                 [ngClass]="{'active': selectedPetId === pet.id}"
                 (click)="selectPet(pet.id)">
-                {{ pet.name }} ({{ pet.type }})
+                <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                <span class="pet-option-text">
+                  <strong>{{ pet.name }}</strong>
+                  <small>{{ pet.type }}</small>
+                </span>
               </button>
             }
           </div>
@@ -26,32 +30,6 @@
           <div class="col-md-8">
             <h3>{{ 'diets.forPet' | translate }} {{ getSelectedPetName() }}</h3>
             <button class="btn btn-success mb-3" (click)="showCreateForm()">{{ 'diets.create' | translate }}</button>
-            @if (showForm) {
-              <div class="card mb-4">
-                <div class="card-header">
-                  <h5>{{ isEditing ? ('diets.editTitle' | translate) : ('diets.createTitle' | translate) }}</h5>
-                </div>
-                <div class="card-body">
-                  <form [formGroup]="dietForm" (ngSubmit)="saveDiet()">
-                    <div class="mb-3">
-                      <label for="name" class="form-label">{{ 'diets.nameLabel' | translate }}</label>
-                      <input type="text" class="form-control" id="name" formControlName="name" required>
-                    </div>
-                    <div class="mb-3">
-                      <label for="description" class="form-label">{{ 'diets.descriptionLabel' | translate }}</label>
-                      <textarea class="form-control" formControlName="description" id="description" required
-                                rows="3"></textarea>
-                    </div>
-                    <button [disabled]="!dietForm.valid" class="btn btn-primary me-2"
-                            type="submit">{{ 'diets.save' | translate }}
-                    </button>
-                    <button (click)="cancelForm()" class="btn btn-secondary"
-                            type="button">{{ 'diets.cancel' | translate }}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            }
             <div class="table-responsive">
               <table class="table table-striped table-hover">
                 <thead class="table-dark">
@@ -85,3 +63,36 @@
     </div>
   </div>
 </div>
+
+@if (showForm) {
+  <div class="modal fade show" aria-modal="true" role="dialog" style="display:block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <form [formGroup]="dietForm" (ngSubmit)="saveDiet()">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ isEditing ? ('diets.editTitle' | translate) : ('diets.createTitle' | translate) }}</h5>
+            <button type="button" class="btn-close" (click)="cancelForm()" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="name" class="form-label">{{ 'diets.nameLabel' | translate }}</label>
+              <input type="text" class="form-control" id="name" formControlName="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">{{ 'diets.descriptionLabel' | translate }}</label>
+              <textarea class="form-control" formControlName="description" id="description" required rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button [disabled]="!dietForm.valid" class="btn btn-primary" type="submit">{{ 'diets.save' | translate }}</button>
+            <button (click)="cancelForm()" class="btn btn-secondary" type="button">{{ 'diets.cancel' | translate }}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show" (click)="cancelForm()"></div>
+}

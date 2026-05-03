@@ -10,15 +10,20 @@
       <div class="row">
 
         <div class="col-md-4">
-          <h3>{{ 'finances.selectPet' | translate }}</h3>
+          <h3 class="pet-selector-title">{{ 'finances.selectPet' | translate }}</h3>
 
-          <div class="list-group">
+          <div class="pet-selector">
             @for (pet of pets; track pet) {
               <button
-                class="list-group-item list-group-item-action"
+                type="button"
+                class="pet-option"
                 [ngClass]="{'active': selectedPetId === pet.id}"
                 (click)="selectPet(pet.id)">
-                {{ pet.name }} ({{ pet.type }})
+                <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                <span class="pet-option-text">
+                  <strong>{{ pet.name }}</strong>
+                  <small>{{ pet.type }}</small>
+                </span>
               </button>
             }
           </div>
@@ -34,55 +39,6 @@
             <button class="btn btn-success mb-3" (click)="showCreateForm()">
               {{ 'finances.newEntry' | translate }}
             </button>
-
-            @if (showForm) {
-              <div class="card mb-4">
-                <div class="card-header">
-                  <h5>
-                    {{ isEditing ? ('finances.editTitle' | translate) : ('finances.createTitle' | translate) }}
-                  </h5>
-                </div>
-
-                <div class="card-body">
-                  <form [formGroup]="expenseForm" (ngSubmit)="saveEntry()">
-
-                    <div class="mb-3">
-                      <label>{{ 'form.date' | translate }}</label>
-                      <input type="date" class="form-control" formControlName="date">
-                    </div>
-
-                    <div class="mb-3">
-                      <label>{{ 'finances.amount' | translate }}</label>
-                      <input type="number" class="form-control" formControlName="amount">
-                    </div>
-
-                    <div class="mb-3">
-                      <label>{{ 'finances.category' | translate }}</label>
-                      <select class="form-control" formControlName="category">
-                        <option value="food">Food</option>
-                        <option value="vet">Vet</option>
-                        <option value="grooming">Grooming</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <div class="mb-3">
-                      <label>{{ 'form.description' | translate }}</label>
-                      <textarea class="form-control" formControlName="description"></textarea>
-                    </div>
-
-                    <button class="btn btn-primary me-2" [disabled]="!expenseForm.valid">
-                      {{ 'finances.save' | translate }}
-                    </button>
-
-                    <button type="button" class="btn btn-secondary" (click)="cancelForm()">
-                      {{ 'finances.cancel' | translate }}
-                    </button>
-
-                  </form>
-                </div>
-              </div>
-            }
 
             <div class="table-responsive">
               <table class="table table-striped">
@@ -176,6 +132,62 @@
     </div>
   </div>
 </div>
+
+@if (showForm) {
+  <div class="modal fade show" aria-modal="true" role="dialog" style="display:block" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <form [formGroup]="expenseForm" (ngSubmit)="saveEntry()">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              {{ isEditing ? ('finances.editTitle' | translate) : ('finances.createTitle' | translate) }}
+            </h5>
+            <button class="btn-close" type="button" (click)="cancelForm()" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label>{{ 'form.date' | translate }}</label>
+              <input type="date" class="form-control" formControlName="date">
+            </div>
+
+            <div class="mb-3">
+              <label>{{ 'finances.amount' | translate }}</label>
+              <input type="number" class="form-control" formControlName="amount">
+            </div>
+
+            <div class="mb-3">
+              <label>{{ 'finances.category' | translate }}</label>
+              <select class="form-control" formControlName="category">
+                <option value="food">Food</option>
+                <option value="vet">Vet</option>
+                <option value="grooming">Grooming</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label>{{ 'form.description' | translate }}</label>
+              <textarea class="form-control" formControlName="description"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-primary" [disabled]="!expenseForm.valid">
+              {{ 'finances.save' | translate }}
+            </button>
+
+            <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+              {{ 'finances.cancel' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show" (click)="cancelForm()"></div>
+}
 
 @if (showModal) {
   <div class="modal fade show" style="display:block">

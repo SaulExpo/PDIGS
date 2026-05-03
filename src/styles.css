@@ -205,6 +205,93 @@ a,
   border-color: transparent;
 }
 
+.pet-selector-title {
+  margin-bottom: 0.9rem;
+  color: var(--brand-700);
+  font-size: 1.35rem;
+}
+
+.pet-selector {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pet-option {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  min-height: 72px;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(20, 61, 42, 0.1);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-main);
+  text-align: left;
+  box-shadow: 0 10px 22px rgba(20, 61, 42, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.pet-option:hover,
+.pet-option:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(38, 122, 76, 0.28);
+  background: #f8fcfa;
+  box-shadow: 0 14px 28px rgba(20, 61, 42, 0.1);
+  outline: none;
+}
+
+.pet-option.active {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
+  color: #fff;
+  box-shadow: 0 16px 30px rgba(38, 122, 76, 0.2);
+}
+
+.pet-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--brand-100);
+  color: var(--brand-700);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pet-option.active .pet-avatar {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.pet-option-text {
+  display: grid;
+  min-width: 0;
+}
+
+.pet-option-text strong,
+.pet-option-text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pet-option-text strong {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.pet-option-text small {
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+}
+
+.pet-option.active .pet-option-text small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
 .table {
   --bs-table-striped-bg: rgba(238, 248, 242, 0.7);
   --bs-table-hover-bg: rgba(219, 240, 226, 0.6);
@@ -272,5 +359,14 @@ a,
 
   .page-body {
     max-height: none;
+  }
+
+  .pet-selector {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    margin-bottom: 1.25rem;
+  }
+
+  .pet-option {
+    min-height: 64px;
   }
 }

@@ -9,15 +9,19 @@
       <div class="row">
         <!-- LISTA DE MASCOTAS -->
         <div class="col-md-4">
-          <h3>{{ 'medical.selectPet' | translate }}</h3>
-          <div class="list-group">
+          <h3 class="pet-selector-title">{{ 'medical.selectPet' | translate }}</h3>
+          <div class="pet-selector">
             @for (pet of pets; track pet) {
               <button
                 type="button"
-                class="list-group-item list-group-item-action"
+                class="pet-option"
                 [ngClass]="{'active': selectedPetId === pet.id}"
                 (click)="selectPet(pet.id)">
-                {{ pet.name }} ({{ pet.type }})
+                <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                <span class="pet-option-text">
+                  <strong>{{ pet.name }}</strong>
+                  <small>{{ pet.type }}</small>
+                </span>
               </button>
             }
           </div>
@@ -31,49 +35,6 @@
             <button class="btn btn-success mb-3" (click)="showCreateForm()">
               {{ 'medical.newEntry' | translate }}
             </button>
-
-            <!-- FORM -->
-            @if (showForm) {
-              <div class="card mb-4">
-                <div class="card-header">
-                  <h5>
-                    {{ isEditing ? ('medical.editTitle' | translate) : ('medical.createTitle' | translate) }}
-                  </h5>
-                </div>
-                <div class="card-body">
-                  <form [formGroup]="medicalForm" (ngSubmit)="saveEntry()">
-
-                    <div class="mb-3">
-                      <label class="form-label">{{ 'form.date' | translate }}</label>
-                      <input type="date" class="form-control" formControlName="date" required>
-                    </div>
-
-                    <div class="mb-3">
-                      <label class="form-label">{{ 'medical.type' | translate }}</label>
-                      <select class="form-control" formControlName="type">
-                        <option value="vaccine">Vaccine</option>
-                        <option value="test">Blood Test</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                    <div class="mb-3">
-                      <label class="form-label">{{ 'form.description' | translate }}</label>
-                      <textarea class="form-control" formControlName="description" rows="4"></textarea>
-                    </div>
-
-                    <button class="btn btn-primary me-2" [disabled]="!medicalForm.valid">
-                      {{ 'medical.save' | translate }}
-                    </button>
-
-                    <button type="button" class="btn btn-secondary" (click)="cancelForm()">
-                      {{ 'medical.cancel' | translate }}
-                    </button>
-
-                  </form>
-                </div>
-              </div>
-            }
 
             <!-- TABLE -->
             <div class="table-responsive">
@@ -114,6 +75,56 @@
     </div>
   </div>
 </div>
+
+@if (showForm) {
+  <div class="modal fade show" aria-modal="true" role="dialog" style="display:block" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <form [formGroup]="medicalForm" (ngSubmit)="saveEntry()">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              {{ isEditing ? ('medical.editTitle' | translate) : ('medical.createTitle' | translate) }}
+            </h5>
+            <button class="btn-close" type="button" (click)="cancelForm()" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">{{ 'form.date' | translate }}</label>
+              <input type="date" class="form-control" formControlName="date" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ 'medical.type' | translate }}</label>
+              <select class="form-control" formControlName="type">
+                <option value="vaccine">Vaccine</option>
+                <option value="test">Blood Test</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ 'form.description' | translate }}</label>
+              <textarea class="form-control" formControlName="description" rows="4"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-primary" [disabled]="!medicalForm.valid">
+              {{ 'medical.save' | translate }}
+            </button>
+
+            <button type="button" class="btn btn-secondary" (click)="cancelForm()">
+              {{ 'medical.cancel' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show" (click)="cancelForm()"></div>
+}
 
 <!-- MODAL -->
 @if (showModal) {
