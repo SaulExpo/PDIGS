@@ -5,14 +5,215 @@
       <p>{{ 'map.subtitle' | translate }}</p>
     </header>
 
-    <div class="page-body">
-      <google-map
-        [center]="center"
-        [zoom]="zoom"
-        [options]="mapOptions"
-        width="100%"
-        height="600px">
-      </google-map>
+    <section class="map-toolbar">
+      <label class="field">
+        <span>{{ 'map.searchLabel' | translate }}</span>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          [placeholder]="'map.searchPlaceholder' | translate"
+          (keyup.enter)="searchNearby()">
+      </label>
+
+      <label class="field field-sm">
+        <span>{{ 'map.radiusLabel' | translate }}</span>
+        <select [(ngModel)]="selectedRadius">
+          @for (option of radiusOptions; track option.value) {
+            <option [ngValue]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="field field-sm">
+        <span>{{ 'map.serviceLabel' | translate }}</span>
+        <select [(ngModel)]="selectedService">
+          @for (option of serviceOptions; track option.value) {
+            <option [value]="option.value">{{ option.labelKey | translate }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="toolbar-actions">
+        <button type="button" class="primary-btn" (click)="searchNearby()" [disabled]="isSearching">
+          {{ isSearching ? ('map.searching' | translate) : ('map.searchButton' | translate) }}
+        </button>
+        <button type="button" class="secondary-btn" (click)="goToMyLocation()" [disabled]="isSearching">
+          {{ 'map.myLocation' | translate }}
+        </button>
+      </div>
+    </section>
+
+    <section class="map-meta">
+      <p>{{ 'map.currentArea' | translate }}: {{ zoneLabel }}</p>
+      <p class="location-status">{{ locationStatusKey | translate }}</p>
+
+      @if (selectedService !== 'all') {
+        <p class="active-filter">
+          {{ 'map.activeFilter' | translate }}: {{ selectedServiceLabel | translate }}
+        </p>
+      }
+
+      @if (canSearchThisArea) {
+        <button type="button" class="link-btn" (click)="searchCurrentArea()">
+          {{ 'map.searchThisArea' | translate }}
+        </button>
+      }
+    </section>
+
+    @if (searchError) {
+      <div class="status-banner">
+        {{ searchError | translate }}
+        @if (debugErrorMessage) {
+          <div class="debug-error">{{ debugErrorMessage }}</div>
+        }
+      </div>
+    }
+
+    <div class="map-layout">
+      <div class="map-main-column">
+        <div class="map-panel">
+          <google-map
+            [center]="center"
+            [zoom]="zoom"
+            [options]="mapOptions"
+            width="100%"
+            height="100%"
+            (mapInitialized)="onMapInitialized($event)"
+            (mapIdle)="onMapIdle()">
+            @for (marker of mapMarkers; track marker.placeId; let index = $index) {
+              <map-marker
+                #mapMarker="mapMarker"
+                [position]="marker.position"
+                [title]="marker.title"
+                [options]="marker.options"
+                (mapClick)="selectVet(vetResults[index], mapMarker)">
+              </map-marker>
+            }
+
+            @if (userLocation) {
+              <map-marker
+                [position]="userLocation"
+                [title]="'map.myLocation' | translate"
+                [options]="userLocationMarkerOptions">
+              </map-marker>
+            }
+
+            <map-info-window>
+              <strong>{{ selectedMarkerTitle }}</strong>
+              @if (selectedMarkerPosition) {
+                <div>{{ selectedMarkerPosition.lat.toFixed(4) }}, {{ selectedMarkerPosition.lng.toFixed(4) }}</div>
+              }
+            </map-info-window>
+          </google-map>
+        </div>
+      </div>
+
+      <aside class="results-panel">
+        <section class="panel-card">
+          <div class="panel-header">
+            <h2>{{ 'map.resultsTitle' | translate }}</h2>
+            <span>{{ vetResults.length }}</span>
+          </div>
+
+          <div class="panel-body">
+            @if (isSearching) {
+              <p class="muted">{{ 'map.loadingResults' | translate }}</p>
+            } @else if (!hasResults) {
+              <p class="muted">{{ 'map.emptyResults' | translate }}</p>
+            } @else {
+              <div class="result-list">
+                @for (vet of vetResults; track vet.placeId) {
+                  <button
+                    type="button"
+                    class="result-card"
+                    [class.result-card-active]="selectedVet?.placeId === vet.placeId"
+                    (click)="selectVet(vet)">
+                    <div class="result-head">
+                      <strong>{{ vet.name }}</strong>
+                      <span>{{ vet.distanceKm | number:'1.1-1' }} km</span>
+                    </div>
+                    <p>{{ vet.address || ('map.addressUnavailable' | translate) }}</p>
+                    <div class="service-tags">
+                      @for (service of vet.matchedServices; track service) {
+                        <span class="service-tag">{{ service }}</span>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </section>
+      </aside>
+
+      <section class="panel-card details-card">
+        <div class="panel-header">
+          <h2>{{ 'map.detailsTitle' | translate }}</h2>
+        </div>
+
+        <div class="panel-body">
+          @if (!selectedVet) {
+            <p class="muted">{{ 'map.detailsEmpty' | translate }}</p>
+          } @else {
+            <div class="detail-block">
+              <h3>{{ selectedVet.name }}</h3>
+              <p>{{ selectedVet.address || ('map.addressUnavailable' | translate) }}</p>
+              <p>{{ selectedVet.distanceKm | number:'1.1-1' }} km</p>
+            </div>
+
+            <div class="detail-grid">
+              <div>
+                <span class="detail-label">{{ 'map.phoneLabel' | translate }}</span>
+                <p>{{ selectedVet.phone || ('map.notAvailable' | translate) }}</p>
+              </div>
+              <div>
+                <span class="detail-label">{{ 'map.websiteLabel' | translate }}</span>
+                @if (selectedVet.website) {
+                  <a [href]="selectedVet.website" target="_blank" rel="noopener">{{ 'map.openWebsite' | translate }}</a>
+                } @else {
+                  <p>{{ 'map.notAvailable' | translate }}</p>
+                }
+              </div>
+            </div>
+
+            <div class="detail-block">
+              <span class="detail-label">{{ 'map.scheduleLabel' | translate }}</span>
+              @if (selectedVet.openingHours?.length) {
+                <ul class="hours-list">
+                  @for (item of selectedVet.openingHours; track item) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              } @else {
+                <p>{{ 'map.notAvailable' | translate }}</p>
+              }
+            </div>
+
+            <div class="detail-block">
+              <span class="detail-label">{{ 'map.servicesDetected' | translate }}</span>
+              <div class="service-tags">
+                @for (service of selectedVet.matchedServices; track service) {
+                  <span class="service-tag">{{ service }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="detail-actions">
+              <button type="button" class="primary-btn" (click)="openInMaps(selectedVet)">
+                {{ 'map.openLocation' | translate }}
+              </button>
+              <button type="button" class="secondary-btn" (click)="openDirections(selectedVet)">
+                {{ 'map.getDirections' | translate }}
+              </button>
+              @if (selectedVet.phone) {
+                <a class="secondary-btn call-link" [href]="'tel:' + selectedVet.phone">
+                  {{ 'map.callVet' | translate }}
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </section>
     </div>
   </div>
 </div>
