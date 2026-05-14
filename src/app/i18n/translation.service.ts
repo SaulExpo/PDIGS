@@ -85,6 +85,12 @@ const TRANSLATIONS: AppTranslations = {
     'pets.actions': 'Acciones',
     'pets.exportPDF': 'Exportar como PDF',
 
+    'pets.type.perro': 'Perro',
+    'pets.type.gato': 'Gato',
+    'pets.type.ave': 'Ave',
+    'pets.type.reptil': 'Reptil',
+    'pets.type.otro': 'Otro',
+
     'diets.title': 'Dietas de mascotas',
     'diets.subtitle': 'Gestiona planes de alimentacion por mascota.',
     'diets.selectPet': 'Seleccionar mascota',
@@ -305,6 +311,12 @@ const TRANSLATIONS: AppTranslations = {
     'pets.ageYears': 'years',
     'pets.actions': 'Actions',
     'pets.exportPDF': 'Export as PDF',
+
+    'pets.type.perro': 'Dog',
+    'pets.type.gato': 'Cat',
+    'pets.type.ave': 'Bird',
+    'pets.type.reptil': 'Reptile',
+    'pets.type.otro': 'Other',
 
     'diets.title': 'Pet diets',
     'diets.subtitle': 'Manage meal plans per pet.',

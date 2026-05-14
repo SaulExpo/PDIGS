@@ -17,6 +17,7 @@ type PetType = 'perro' | 'gato' | 'ave' | 'reptil' | 'otro';
 @Component({
   selector: 'app-pets',
   imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  providers: [TranslatePipe],
   templateUrl: './pets.component.html',
   styleUrl: './pets.component.css'
 })
@@ -28,6 +29,7 @@ export class PetsComponent implements OnInit, OnDestroy {
   private pdfExportService = inject(PdfExportService);
   private alertService = inject(AlertService);
   private cloudinaryService = inject(CloudinaryService);
+  private translatePipe = inject(TranslatePipe);
 
   showForm = false;
   isEditing = false;
@@ -171,6 +173,26 @@ export class PetsComponent implements OnInit, OnDestroy {
     } finally {
       this.isExporting = false;
     }
+  }
+
+  getPetTypeName(pet_type: string): string {
+    const TRANSLATABLE_PETS: PetType[] = ['perro', 'gato', 'ave', 'reptil', 'otro'];
+
+    if (TRANSLATABLE_PETS.includes(pet_type as PetType)) {
+      switch (pet_type) {
+        case 'perro':
+          return this.translatePipe.transform('pets.type.perro');
+        case 'gato':
+          return this.translatePipe.transform('pets.type.gato');
+        case 'ave':
+          return this.translatePipe.transform('pets.type.ave');
+        case 'reptil':
+          return this.translatePipe.transform('pets.type.reptil');
+        default:
+          return this.translatePipe.transform('pets.type.otro');
+      }
+    }
+    return pet_type;
   }
 
   showCreateForm() {

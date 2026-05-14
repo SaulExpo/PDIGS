@@ -18,7 +18,7 @@ export class TranslatePipe implements PipeTransform {
     });
   }
 
-  transform(key: string): string {
+  public transform(key: string): string {
     return this.translation.translate(key);
   }
 
