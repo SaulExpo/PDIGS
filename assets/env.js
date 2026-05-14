@@ -8,5 +8,9 @@ window.__env = {
     "appId": "1:394833869657:web:b56afcb4c797cc7b842a48",
     "measurementId": "G-H7K5YREMSB"
   },
-  "googleMapsApiKey": "AIzaSyA8vJvACNlU6sTjvlTv_BMNwTUpBlIKdfI"
+  "googleMapsApiKey": "AIzaSyA8vJvACNlU6sTjvlTv_BMNwTUpBlIKdfI",
+  "cloudinary": {
+    "cloudName": "dhy9na0gx",
+    "uploadPreset": "PDIGS app"
+  }
 };
