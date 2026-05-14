@@ -80,9 +80,9 @@
         </select>
       </div>
 
-      <a class="nav-link text-white" (click)="logout()" style="cursor: pointer;">
+      <button class="nav-link text-white sidebar-action-link" type="button" (click)="logout()">
         <i class="fas fa-sign-out-alt me-2"></i><span [class.visually-hidden]="isSidebarCollapsed && !isMobile">{{ 'sidebar.logout' | translate }}</span>
-      </a>
+      </button>
     </nav>
   </aside>
 
