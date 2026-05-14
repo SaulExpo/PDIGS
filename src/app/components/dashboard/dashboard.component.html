@@ -5,6 +5,19 @@
     [class.dashboard-sidebar--collapsed]="isSidebarCollapsed && !isMobile"
   >
     <div class="sidebar-header">
+      <a
+        class="sidebar-brand"
+        routerLink="pets"
+        (click)="closeSidebar()"
+        aria-label="PIGS Manager">
+        <span class="sidebar-brand-logo" aria-hidden="true">
+          <i class="fas fa-paw"></i>
+        </span>
+        @if (!isSidebarCollapsed || isMobile) {
+          <span class="sidebar-brand-text">PIGS</span>
+        }
+      </a>
+
       <button
         type="button"
         class="sidebar-icon-btn d-lg-none"

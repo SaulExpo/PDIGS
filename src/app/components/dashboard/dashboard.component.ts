@@ -1,7 +1,9 @@
-import { Component, HostListener, inject, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged, signOut, updateProfile } from '@angular/fire/auth';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Title } from '@angular/platform-browser';
+import { filter, Subscription } from 'rxjs';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { SupportedLang, TranslationService } from '../../i18n/translation.service';
 import { AlertService } from '../../services/alert/alert.service';
@@ -14,7 +16,7 @@ import { ReminderNotificationsService } from '../../services/reminder-notificati
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   userName = '';
   userPhotoURL = '';
   currentLanguage: SupportedLang;
@@ -33,10 +35,12 @@ export class DashboardComponent implements OnInit {
 
   private auth = inject(Auth);
   private router = inject(Router);
+  private title = inject(Title);
   private translation = inject(TranslationService);
   private reminderNotifications = inject(ReminderNotificationsService);
   private cloudinaryService = inject(CloudinaryService);
   private alertService = inject(AlertService);
+  private subscriptions = new Subscription();
 
   constructor() {
     this.currentLanguage = this.translation.getLanguage();
@@ -121,6 +125,16 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.syncSidebarMode();
+    this.updateDocumentTitle();
+    this.subscriptions.add(
+      this.router.events
+        .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+        .subscribe(() => this.updateDocumentTitle())
+    );
+    this.subscriptions.add(
+      this.translation.language$().subscribe(() => this.updateDocumentTitle())
+    );
+
     onAuthStateChanged(this.auth, (user) => {
       // TODO: disable observer -> add subscription and unsubscribe it when onDestroy()
       if (user) {
@@ -132,6 +146,11 @@ export class DashboardComponent implements OnInit {
         this.router.navigate(['/login']);
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+    this.clearSelectedProfilePhoto();
   }
 
   setLanguage(language: string) {
@@ -178,6 +197,23 @@ export class DashboardComponent implements OnInit {
     if (this.isMobile) {
       this.isSidebarCollapsed = false;
     }
+  }
+
+  private updateDocumentTitle() {
+    const path = this.router.url.split('?')[0].split('#')[0];
+    const section = path.split('/').filter(Boolean).pop() || 'pets';
+    const titleKeyByRoute: Record<string, string> = {
+      pets: 'sidebar.pets',
+      diets: 'sidebar.diets',
+      diary: 'sidebar.diary',
+      'medical-records': 'sidebar.medicalRecords',
+      calendar: 'sidebar.calendar',
+      map: 'sidebar.map',
+      finances: 'sidebar.finances',
+      guide: 'sidebar.guide'
+    };
+    const pageTitle = this.translation.translate(titleKeyByRoute[section] || 'sidebar.pets');
+    this.title.setTitle(`${pageTitle} | PIGS Manager`);
   }
 
   private clearSelectedProfilePhoto() {
