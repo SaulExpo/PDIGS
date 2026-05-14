@@ -25,7 +25,16 @@
     </div>
 
     <div class="sidebar-profile text-center mb-4">
-      <img [src]="userPhotoURL" [alt]="'sidebar.userPhotoAlt' | translate" class="rounded-circle mb-2 sidebar-avatar">
+      <div class="sidebar-avatar-wrap">
+        <img [src]="userPhotoURL" [alt]="'sidebar.userPhotoAlt' | translate" class="rounded-circle mb-2 sidebar-avatar">
+        <button
+          type="button"
+          class="profile-edit-btn"
+          (click)="openProfileModal()"
+          aria-label="Editar perfil">
+          <i class="fas fa-pen"></i>
+        </button>
+      </div>
       @if (!isSidebarCollapsed || isMobile) {
         <h5>{{ userName }}</h5>
       }
@@ -113,3 +122,57 @@
     </div>
   </main>
 </div>
+
+@if (showProfileModal) {
+  <div class="modal fade show" aria-modal="true" role="dialog" style="display:block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar perfil</h5>
+            <button type="button" class="btn-close" (click)="closeProfileModal()" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div class="profile-photo-preview">
+              <img
+                [src]="profilePhotoPreviewUrl || profileForm.get('photoURL')?.value || userPhotoURL"
+                alt="Vista previa del perfil">
+            </div>
+
+            <div class="mb-3">
+              <label for="profileName" class="form-label">Nombre</label>
+              <input
+                id="profileName"
+                type="text"
+                class="form-control"
+                formControlName="displayName">
+            </div>
+
+            <div class="mb-3">
+              <label for="profilePhotoFile" class="form-label">Foto de perfil</label>
+              <input
+                id="profilePhotoFile"
+                type="file"
+                class="form-control"
+                accept="image/*"
+                (change)="onProfilePhotoSelected($event)">
+              <div class="form-text">Se subira a Cloudinary al guardar. Maximo 10 MB.</div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isSavingProfile">
+              {{ isSavingProfile ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="closeProfileModal()">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show" (click)="closeProfileModal()"></div>
+}

@@ -1,8 +1,15 @@
 .guide-page {
+  min-height: auto;
+  padding-bottom: 6rem;
   background:
     radial-gradient(circle at top left, rgba(255, 244, 214, 0.8), transparent 34%),
     radial-gradient(circle at bottom right, rgba(169, 224, 180, 0.55), transparent 28%),
     linear-gradient(135deg, #fbf7ef, #edf7f0 55%, #e8f0ff);
+}
+
+:host ::ng-deep .page-body {
+  max-height: none;
+  overflow: visible;
 }
 
 .guide-card {

@@ -2,15 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subscription } from "rxjs";
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { TranslationService } from '../../i18n/translation.service';
-import { Subscription } from "rxjs";
-import { PetsService } from "../../services/pets/pets.service";
 import { Pet } from '../../model/model.interface';
-import { PetExportService } from '../../services/pet-export/pet-export.service';
-import { PdfExportService } from '../../services/pdf-export/pdf-export.service';
 import { AlertService } from '../../services/alert/alert.service';
 import { CloudinaryService } from '../../services/cloudinary/cloudinary.service';
+import { PdfExportService } from '../../services/pdf-export/pdf-export.service';
+import { PetExportService } from '../../services/pet-export/pet-export.service';
+import { PetsService } from "../../services/pets/pets.service";
 
 type PetType = 'perro' | 'gato' | 'ave' | 'reptil' | 'otro';
 
@@ -336,6 +336,8 @@ export class PetsComponent implements OnInit, OnDestroy {
       userId: this.auth.currentUser?.uid!
     };
 
+    this.showForm = false;
+
     try {
       if (this.isEditing && this.editingPetId) {
         await this.petsService.updatePet(this.editingPetId, petData);
@@ -345,7 +347,6 @@ export class PetsComponent implements OnInit, OnDestroy {
         await this.alertService.success('create', this.getEntityLabel());
       }
 
-      this.showForm = false;
       this.petForm.reset();
       this.clearSelectedPhoto();
       this.isEditing = false;
