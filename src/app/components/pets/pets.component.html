@@ -26,6 +26,7 @@
         <table class="table table-striped table-hover">
           <thead class="table-dark">
             <tr>
+              <th>Foto</th>
               <th>{{ 'form.name' | translate }}</th>
               <th>{{ 'form.type' | translate }}</th>
               <th>{{ 'form.age' | translate }}</th>
@@ -36,6 +37,13 @@
           <tbody>
             @for (pet of pets; track pet) {
               <tr>
+                <td>
+                  @if (pet.mainPhotoUrl) {
+                    <img class="pet-table-photo" [src]="pet.mainPhotoUrl" [alt]="pet.name">
+                  } @else {
+                    <span class="pet-table-photo pet-table-photo-placeholder">{{ pet.name.charAt(0) }}</span>
+                  }
+                </td>
                 <td>{{ pet.name }}</td>
                 <td>{{ pet.type }}</td>
                 <td>{{ pet.age }}</td>
@@ -94,12 +102,24 @@
               </div>
 
               <div class="col-md-6 mb-3">
-                <label for="type" class="form-label">{{ 'form.type' | translate }}</label>
-                <input type="text" class="form-control" id="type" formControlName="type" required>
+                <label class="form-label">{{ 'form.type' | translate }}</label>
+                <div class="pet-type-picker" role="radiogroup" [attr.aria-label]="'form.type' | translate">
+                  @for (type of petTypes; track type.value) {
+                    <button
+                      type="button"
+                      class="pet-type-option"
+                      [class.active]="petForm.get('type')?.value === type.value"
+                      [attr.aria-pressed]="petForm.get('type')?.value === type.value"
+                      (click)="setPetType(type.value)">
+                      <i class="fa-solid" [ngClass]="type.icon" aria-hidden="true"></i>
+                      <span>{{ type.label }}</span>
+                    </button>
+                  }
+                </div>
 
                 @if (petForm.get('type')?.invalid && petForm.get('type')?.touched) {
                   <div class="text-danger small mt-1">
-                    Type is required.
+                    Selecciona perro, gato, ave, reptil u otro.
                   </div>
                 }
               </div>
@@ -118,21 +138,77 @@
               </div>
 
               <div class="col-md-6 mb-3">
-                <label for="breed" class="form-label">{{ 'form.breed' | translate }}</label>
-                <input type="text" class="form-control" id="breed" formControlName="breed" required>
+                <label class="form-label">{{ 'form.breed' | translate }}</label>
+                @if (getBreedOptions().length) {
+                  <div class="pet-breed-picker" role="radiogroup" [attr.aria-label]="'form.breed' | translate">
+                    @for (breed of getBreedOptions(); track breed) {
+                      <button
+                        type="button"
+                        class="pet-breed-option"
+                        [class.active]="petForm.get('breed')?.value === breed"
+                        [attr.aria-pressed]="petForm.get('breed')?.value === breed"
+                        (click)="setBreed(breed)">
+                        <i class="fa-solid" [ngClass]="getBreedIcon()" aria-hidden="true"></i>
+                        <span>{{ breed }}</span>
+                      </button>
+                    }
+                  </div>
+                } @else if (isOtherTypeSelected()) {
+                  <div class="pet-breed-custom">
+                    <i class="fa-solid" [ngClass]="getBreedIcon()" aria-hidden="true"></i>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="breed"
+                      formControlName="breed"
+                      placeholder="Ej: hamster, conejo, huron..."
+                      required>
+                  </div>
+                } @else {
+                  <div class="pet-breed-empty">
+                    Selecciona primero un tipo de mascota.
+                  </div>
+                }
 
                 @if (petForm.get('breed')?.invalid && petForm.get('breed')?.touched) {
                   <div class="text-danger small mt-1">
-                    Breed is required.
+                    Selecciona una raza valida.
                   </div>
                 }
               </div>
             </div>
+
+            <div class="mb-3">
+              <label for="petPhotoFile" class="form-label">Subir foto</label>
+              <input
+                type="file"
+                class="form-control"
+                id="petPhotoFile"
+                accept="image/*"
+                (change)="onPhotoSelected($event)">
+              <div class="form-text">
+                Se subira a Cloudinary al guardar. Maximo 10 MB.
+              </div>
+            </div>
+
+            @if (photoPreviewUrl) {
+              <div class="mb-3">
+                <div class="pet-photo-preview">
+                  <img [src]="photoPreviewUrl" alt="Vista previa de la mascota">
+                </div>
+              </div>
+            } @else if (petForm.get('mainPhotoUrl')?.value) {
+              <div class="mb-3">
+                <div class="pet-photo-preview">
+                  <img [src]="petForm.get('mainPhotoUrl')?.value" alt="Vista previa de la mascota">
+                </div>
+              </div>
+            }
           </div>
 
           <div class="modal-footer">
-            <button [disabled]="!petForm.valid" class="btn btn-primary" type="submit">
-              {{ 'pets.save' | translate }}
+            <button [disabled]="!petForm.valid || isUploadingPhoto" class="btn btn-primary" type="submit">
+              {{ isUploadingPhoto ? 'Subiendo foto...' : ('pets.save' | translate) }}
             </button>
 
             <button (click)="cancelForm()" class="btn btn-secondary" type="button">
@@ -159,6 +235,12 @@
 
         @if (selectedPet) {
           <div class="modal-body">
+            @if (selectedPet.mainPhotoUrl) {
+              <div class="pet-detail-photo">
+                <img [src]="selectedPet.mainPhotoUrl" [alt]="selectedPet.name">
+              </div>
+            }
+
             <div class="row">
               <div class="col-md-6">
                 <h6><strong>{{ 'form.name' | translate }}:</strong></h6>

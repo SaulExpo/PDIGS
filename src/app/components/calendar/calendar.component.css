@@ -58,6 +58,22 @@
   background: rgba(247, 251, 248, 0.9);
 }
 
+.calendar-pet-selector {
+  max-height: 220px;
+  overflow: auto;
+}
+
+.calendar-event-photo {
+  margin-bottom: 1rem;
+}
+
+.calendar-event-photo img {
+  width: 100%;
+  max-height: 260px;
+  border-radius: 0.9rem;
+  object-fit: cover;
+}
+
 @media (max-width: 768px) {
   .calendar-body {
     padding-right: 0;

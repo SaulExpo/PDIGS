@@ -4,6 +4,7 @@ export interface Pet {
   type: string;
   age: number;
   breed: string;
+  mainPhotoUrl?: string;
   userId: string;
 }
 
@@ -13,6 +14,7 @@ export interface DiaryEntry {
   date: string;
   title: string;
   description: string;
+  mainPhotoUrl?: string;
   userId: string;
 }
 
@@ -21,6 +23,7 @@ export interface Diet {
   petId: string;
   name: string;
   description: string;
+  mainPhotoUrl?: string;
   userId: string;
 }
 

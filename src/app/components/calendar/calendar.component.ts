@@ -63,6 +63,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
     reminderDate: string;
     reminderTime: string;
     reminderMessage: string;
+    petPhotoUrl: string;
+    entryPhotoUrl: string;
   } | null = null;
 
   successMessage = '';
@@ -145,6 +147,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
         extendedProps: {
           description: entry.description,
           petName: pet?.name || petFallback,
+          petPhotoUrl: pet?.mainPhotoUrl || '',
+          entryPhotoUrl: entry.mainPhotoUrl || '',
           time: '',
           source: 'diary'
         }
@@ -162,6 +166,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
         extendedProps: {
           description: event.description,
           petName: pet?.name || petFallback,
+          petPhotoUrl: pet?.mainPhotoUrl || '',
+          entryPhotoUrl: '',
           time: event.time,
           source: 'custom',
           hasReminder: !!event.hasReminder,
@@ -205,6 +211,11 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.isEditingEvent = false;
     this.editingEventId = null;
     this.eventForm.reset();
+  }
+
+  selectEventPet(petId: string) {
+    this.eventForm.patchValue({ petId });
+    this.eventForm.get('petId')?.markAsTouched();
   }
 
   handleDateClick(arg: DateClickArg) {
@@ -306,6 +317,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
         if (this.selectedEventDetails?.id === this.editingEventId) {
           const petName = this.pets.find(pet => pet.id === eventData.petId)?.name
             || this.translation.translate('calendar.petFallback');
+          const petPhotoUrl = this.pets.find(pet => pet.id === eventData.petId)?.mainPhotoUrl || '';
 
           this.selectedEventDetails = {
             ...this.selectedEventDetails,
@@ -314,6 +326,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
             date: eventData.date,
             time: eventData.time,
             petName,
+            petPhotoUrl,
             hasReminder: eventData.hasReminder,
             reminderDate: eventData.reminderDate,
             reminderTime: eventData.reminderTime,
@@ -365,7 +378,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
       hasReminder: !!event.extendedProps['hasReminder'],
       reminderDate: event.extendedProps['reminderDate'] || '',
       reminderTime: event.extendedProps['reminderTime'] || '',
-      reminderMessage: event.extendedProps['reminderMessage'] || ''
+      reminderMessage: event.extendedProps['reminderMessage'] || '',
+      petPhotoUrl: event.extendedProps['petPhotoUrl'] || '',
+      entryPhotoUrl: event.extendedProps['entryPhotoUrl'] || ''
     };
 
     this.showModal = true;

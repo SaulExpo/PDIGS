@@ -33,7 +33,11 @@ const output = {
     appId: env.FIREBASE_APP_ID || '',
     measurementId: env.FIREBASE_MEASUREMENT_ID || ''
   },
-  googleMapsApiKey: env.GOOGLE_MAPS_API_KEY || ''
+  googleMapsApiKey: env.GOOGLE_MAPS_API_KEY || '',
+  cloudinary: {
+    cloudName: env.CLOUDINARY_CLOUD_NAME || '',
+    uploadPreset: env.CLOUDINARY_UPLOAD_PRESET || ''
+  }
 };
 
 const content = `window.__env = ${JSON.stringify(output, null, 2)};\n`;

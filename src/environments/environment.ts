@@ -9,7 +9,11 @@ const defaultEnvironment = {
     appId: "",
     measurementId: ""
   },
-  googleMapsApiKey: ""
+  googleMapsApiKey: "",
+  cloudinary: {
+    cloudName: "",
+    uploadPreset: ""
+  }
 };
 
 export const environment = (window as any).__env

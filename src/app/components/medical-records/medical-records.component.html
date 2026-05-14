@@ -17,7 +17,11 @@
                 class="pet-option"
                 [ngClass]="{'active': selectedPetId === pet.id}"
                 (click)="selectPet(pet.id)">
-                <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                @if (pet.mainPhotoUrl) {
+                  <img class="pet-avatar pet-avatar-image" [src]="pet.mainPhotoUrl" [alt]="pet.name">
+                } @else {
+                  <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                }
                 <span class="pet-option-text">
                   <strong>{{ pet.name }}</strong>
                   <small>{{ pet.type }}</small>

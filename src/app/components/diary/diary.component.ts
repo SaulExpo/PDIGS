@@ -9,6 +9,7 @@ import { DiaryService } from "../../services/diary/diary.service";
 import { Subscription } from "rxjs";
 import { DiaryEntry, Pet } from "../../model/model.interface";
 import { AlertService } from '../../services/alert/alert.service';
+import { CloudinaryService } from '../../services/cloudinary/cloudinary.service';
 
 @Component({
   selector: 'app-diary',
@@ -22,6 +23,7 @@ export class DiaryComponent implements OnInit, OnDestroy {
   private auth = inject(Auth);
   private translation = inject(TranslationService);
   private alertService = inject(AlertService);
+  private cloudinaryService = inject(CloudinaryService);
 
   selectedPetId: string | null = null;
   showForm = false;
@@ -30,11 +32,15 @@ export class DiaryComponent implements OnInit, OnDestroy {
   showModal = false;
   modalVisible = false;
   selectedEntry: DiaryEntry | null = null;
+  isUploadingPhoto = false;
+  selectedPhotoFile: File | null = null;
+  photoPreviewUrl = '';
 
   diaryForm = new FormGroup({
     date: new FormControl('', Validators.required),
     title: new FormControl('', Validators.required),
-    description: new FormControl('', Validators.required)
+    description: new FormControl('', Validators.required),
+    mainPhotoUrl: new FormControl('')
   });
   private petsService = inject(PetsService);
   private diaryService = inject(DiaryService);
@@ -74,6 +80,7 @@ export class DiaryComponent implements OnInit, OnDestroy {
   }
 
   showCreateForm() {
+    this.clearSelectedPhoto();
     this.isEditing = false;
     this.editingEntryId = null;
     this.diaryForm.reset();
@@ -82,19 +89,55 @@ export class DiaryComponent implements OnInit, OnDestroy {
   }
 
   showEditForm(entry: DiaryEntry) {
+    this.clearSelectedPhoto();
     this.isEditing = true;
     this.editingEntryId = entry.id;
     this.diaryForm.setValue({
       date: entry.date,
       title: entry.title,
-      description: entry.description
+      description: entry.description,
+      mainPhotoUrl: entry.mainPhotoUrl || ''
     });
     this.showForm = true;
   }
 
   cancelForm() {
+    this.clearSelectedPhoto();
     this.showForm = false;
     this.diaryForm.reset();
+  }
+
+  async onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+
+    this.clearSelectedPhoto();
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      await this.alertService.validation('Selecciona un archivo de imagen.', 'Please select an image file.');
+      input.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      await this.alertService.validation('La imagen debe ocupar 10 MB o menos.', 'The image must be 10 MB or smaller.');
+      input.value = '';
+      return;
+    }
+
+    this.selectedPhotoFile = file;
+    this.photoPreviewUrl = URL.createObjectURL(file);
+  }
+
+  clearSelectedPhoto() {
+    if (this.photoPreviewUrl) {
+      URL.revokeObjectURL(this.photoPreviewUrl);
+    }
+
+    this.selectedPhotoFile = null;
+    this.photoPreviewUrl = '';
   }
 
   async saveEntry() {
@@ -108,11 +151,32 @@ export class DiaryComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.diaryForm.value;
+    let mainPhotoUrl = formValue.mainPhotoUrl || '';
+
+    if (this.selectedPhotoFile) {
+      try {
+        this.isUploadingPhoto = true;
+        mainPhotoUrl = await this.cloudinaryService.uploadImage(this.selectedPhotoFile);
+        this.diaryForm.patchValue({ mainPhotoUrl });
+      } catch (error) {
+        console.error('Error uploading diary photo:', error);
+        const message = error instanceof Error ? error.message : 'No se pudo subir la foto.';
+        await this.alertService.validation(
+          `No se pudo subir la foto a Cloudinary: ${message}`,
+          `Could not upload the photo to Cloudinary: ${message}`
+        );
+        return;
+      } finally {
+        this.isUploadingPhoto = false;
+      }
+    }
+
     const entryData = {
       petId: this.selectedPetId,
       date: formValue.date!,
       title: formValue.title!,
       description: formValue.description!,
+      mainPhotoUrl,
       userId: this.auth.currentUser?.uid!
     };
 
@@ -176,6 +240,7 @@ export class DiaryComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.clearSelectedPhoto();
     if (this.petsSubscription) this.petsSubscription.unsubscribe();
     if (this.diarySubscription) this.diarySubscription.unsubscribe();
   }

@@ -261,6 +261,10 @@ a,
   text-transform: uppercase;
 }
 
+.pet-avatar-image {
+  object-fit: cover;
+}
+
 .pet-option.active .pet-avatar {
   background: rgba(255, 255, 255, 0.22);
   color: #fff;
@@ -290,6 +294,49 @@ a,
 
 .pet-option.active .pet-option-text small {
   color: rgba(255, 255, 255, 0.82);
+}
+
+.content-table-photo,
+.content-table-photo-placeholder {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.content-table-photo {
+  object-fit: cover;
+}
+
+.content-table-photo-placeholder {
+  background: var(--brand-100);
+  color: var(--brand-700);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.content-photo-preview {
+  margin-top: 0.75rem;
+}
+
+.content-photo-preview img {
+  width: 100%;
+  max-height: 220px;
+  border-radius: 0.9rem;
+  object-fit: cover;
+  border: 1px solid rgba(20, 61, 42, 0.12);
+}
+
+.content-detail-photo {
+  margin-bottom: 1rem;
+}
+
+.content-detail-photo img {
+  width: 100%;
+  max-height: 280px;
+  border-radius: 0.9rem;
+  object-fit: cover;
 }
 
 .table {

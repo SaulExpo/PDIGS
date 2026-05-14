@@ -16,7 +16,11 @@
                 class="pet-option"
                 [ngClass]="{'active': selectedPetId === pet.id}"
                 (click)="selectPet(pet.id)">
-                <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                @if (pet.mainPhotoUrl) {
+                  <img class="pet-avatar pet-avatar-image" [src]="pet.mainPhotoUrl" [alt]="pet.name">
+                } @else {
+                  <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                }
                 <span class="pet-option-text">
                   <strong>{{ pet.name }}</strong>
                   <small>{{ pet.type }}</small>
@@ -34,6 +38,7 @@
               <table class="table table-striped table-hover">
                 <thead class="table-dark">
                 <tr>
+                  <th>Foto</th>
                   <th>{{ 'form.date' | translate }}</th>
                   <th>{{ 'form.title' | translate }}</th>
                   <th>{{ 'diary.actions' | translate }}</th>
@@ -42,6 +47,13 @@
                 <tbody>
                   @for (entry of diaryEntries; track entry) {
                     <tr>
+                      <td>
+                        @if (entry.mainPhotoUrl) {
+                          <img class="content-table-photo" [src]="entry.mainPhotoUrl" [alt]="entry.title">
+                        } @else {
+                          <span class="content-table-photo content-table-photo-placeholder">{{ entry.title.charAt(0) }}</span>
+                        }
+                      </td>
                       <td>{{ formatDate(entry.date) }}</td>
                       <td>{{ entry.title }}</td>
                       <td>
@@ -90,10 +102,38 @@
               <label for="description" class="form-label">{{ 'form.description' | translate }}</label>
               <textarea class="form-control" formControlName="description" id="description" required rows="4"></textarea>
             </div>
+            <div class="mb-3">
+              <label for="diaryPhotoFile" class="form-label">Subir foto</label>
+              <input
+                type="file"
+                class="form-control"
+                id="diaryPhotoFile"
+                accept="image/*"
+                (change)="onPhotoSelected($event)">
+              <div class="form-text">
+                Se subira a Cloudinary al guardar. Maximo 10 MB.
+              </div>
+            </div>
+
+            @if (photoPreviewUrl) {
+              <div class="mb-3">
+                <div class="content-photo-preview">
+                  <img [src]="photoPreviewUrl" alt="Vista previa de la entrada">
+                </div>
+              </div>
+            } @else if (diaryForm.get('mainPhotoUrl')?.value) {
+              <div class="mb-3">
+                <div class="content-photo-preview">
+                  <img [src]="diaryForm.get('mainPhotoUrl')?.value" alt="Vista previa de la entrada">
+                </div>
+              </div>
+            }
           </div>
 
           <div class="modal-footer">
-            <button [disabled]="!diaryForm.valid" class="btn btn-primary" type="submit">{{ 'diary.save' | translate }}</button>
+            <button [disabled]="!diaryForm.valid || isUploadingPhoto" class="btn btn-primary" type="submit">
+              {{ isUploadingPhoto ? 'Subiendo foto...' : ('diary.save' | translate) }}
+            </button>
             <button (click)="cancelForm()" class="btn btn-secondary" type="button">{{ 'diary.cancel' | translate }}</button>
           </div>
         </form>
@@ -115,6 +155,12 @@
         </div>
         @if (selectedEntry) {
           <div class="modal-body">
+            @if (selectedEntry.mainPhotoUrl) {
+              <div class="content-detail-photo">
+                <img [src]="selectedEntry.mainPhotoUrl" [alt]="selectedEntry.title">
+              </div>
+            }
+
             <div class="row">
               <div class="col-md-6">
                 <h6><strong>{{ 'form.date' | translate }}:</strong></h6>

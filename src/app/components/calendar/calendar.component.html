@@ -51,13 +51,26 @@
               </div>
 
               <div class="col-md-6 mb-3">
-                <label for="petId" class="form-label">{{ 'calendar.petLabel' | translate }}</label>
-                <select id="petId" class="form-select" formControlName="petId">
-                  <option value="">{{ 'calendar.selectPet' | translate }}</option>
+                <label class="form-label">{{ 'calendar.petLabel' | translate }}</label>
+                <div class="pet-selector calendar-pet-selector">
                   @for (pet of pets; track pet.id) {
-                    <option [value]="pet.id">{{ pet.name }}</option>
+                    <button
+                      type="button"
+                      class="pet-option"
+                      [class.active]="eventForm.get('petId')?.value === pet.id"
+                      (click)="selectEventPet(pet.id)">
+                      @if (pet.mainPhotoUrl) {
+                        <img class="pet-avatar pet-avatar-image" [src]="pet.mainPhotoUrl" [alt]="pet.name">
+                      } @else {
+                        <span class="pet-avatar" aria-hidden="true">{{ pet.name.charAt(0) }}</span>
+                      }
+                      <span class="pet-option-text">
+                        <strong>{{ pet.name }}</strong>
+                        <small>{{ pet.type }}</small>
+                      </span>
+                    </button>
                   }
-                </select>
+                </div>
 
                 @if (eventForm.get('petId')?.invalid && eventForm.get('petId')?.touched) {
                   <div class="text-danger small mt-1">
@@ -166,6 +179,14 @@
 
         @if (selectedEventDetails) {
           <div class="modal-body">
+
+
+            @if (selectedEventDetails.entryPhotoUrl) {
+              <div class="content-detail-photo">
+                <img [src]="selectedEventDetails.entryPhotoUrl" [alt]="selectedEventDetails.title">
+              </div>
+            }
+
             <p><strong>{{ 'calendar.titleLabel' | translate }}:</strong> {{ selectedEventDetails.title }}</p>
             <p><strong>{{ 'calendar.description' | translate }}:</strong> {{ selectedEventDetails.description }}</p>
             <p><strong>{{ 'calendar.dateLabel' | translate }}:</strong> {{ selectedEventDetails.date }}</p>
